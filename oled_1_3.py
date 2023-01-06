@@ -61,7 +61,7 @@ class OLED_1inch3(framebuf.FrameBuffer):
 
         self.write_cmd(0xB0)   #set page address 
       
-        self.write_cmd(0xdc)    #et display start line 
+        self.write_cmd(0xdc)    #set display start line 
         self.write_cmd(0x00) 
         self.write_cmd(0x81)    #contract control 
         self.write_cmd(0x6f)    #128
