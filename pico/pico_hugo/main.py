@@ -5,7 +5,7 @@ for final use: put main.py on RP2
 import time
 import wlan_helper
 import influxdb
-from machine import Pin
+import machine
 
 wlan_helper.enable_oled() # comment out if there is no oled
 wlan_helper.start_wlan()
@@ -17,7 +17,7 @@ time_restart_ms = time.ticks_add(wlan_helper.time_start_ms, 3 * 60 * 60 * 1000) 
 from onewire import OneWire
 from ds18x20 import DS18X20
 
-ds = DS18X20(OneWire(Pin(28)))
+ds = DS18X20(OneWire(machine.Pin(28)))
 sensors = ds.scan()
 ds.convert_temp() # after power on reset the value is wrong. Therefore measure here once.
 time.sleep_ms(900)  # mandatory pause to collect results, datasheet max 750 ms
@@ -27,6 +27,22 @@ for s in sensors:
 DS18B20_id_tags = {
     '28BF0FA40E000001': {'position': 'angeschraubt', 'setup':'charlie'},
     }
+
+
+    
+key0_was_pressed = False
+key1_was_pressed = False
+def key0_isr(p):
+    global key0_was_pressed
+    key0_was_pressed = True
+def key1_isr(p):
+    global key1_was_pressed
+    key1_was_pressed = True
+key0 = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP)
+key1 = machine.Pin(17, machine.Pin.IN, machine.Pin.PULL_UP)
+key0.irq(trigger=machine.Pin.IRQ_FALLING, handler=key0_isr)
+key1.irq(trigger=machine.Pin.IRQ_FALLING, handler=key1_isr)
+
 
 while True:
     wlan_helper.led.value(1)
@@ -80,7 +96,14 @@ while True:
         time.sleep_ms(50)
         wlan_helper.led.value(0)
         time.sleep_ms(1000-50)
-        
+        time.sleep_ms(50)
+        if key0_was_pressed:
+            wlan_helper.print_oled('key0 pressed')
+            key0_was_pressed = False
+            wlan_helper.time_next_update_ms = time.ticks_ms()
+        if key1_was_pressed:
+            wlan_helper.print_oled('key1 pressed')
+            machine.reset()
     wlan_helper.print_time_since_start_s()
 
         
