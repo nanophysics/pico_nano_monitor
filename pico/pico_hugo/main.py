@@ -42,7 +42,8 @@ key0 = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP)
 key1 = machine.Pin(17, machine.Pin.IN, machine.Pin.PULL_UP)
 key0.irq(trigger=machine.Pin.IRQ_FALLING, handler=key0_isr)
 key1.irq(trigger=machine.Pin.IRQ_FALLING, handler=key1_isr)
-
+key0_was_pressed = False
+key1_was_pressed = False
 
 while True:
     wlan_helper.led.value(1)
