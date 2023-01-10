@@ -30,12 +30,15 @@ connected = False
 def start_wlan():
     global connected
     for secret in secrets.wlan_credentials:
+        status_old = None
         wlan.connect(secret["SSID"], secret["PASSWORD"])
         for max_wait in range(20):
             time.sleep_ms(500)
             status = wlan.status()
-            print("WLAN: SSID:", secret["SSID"], status_dict.get("%s" % status))
-            print_oled('SSID:', secret["SSID"], ':s%s' % status)
+            if status != status_old:
+                print("WLAN: SSID:", secret["SSID"], status_dict.get("%s" % status))
+                print_oled('SSID:', secret["SSID"], ':s%s' % status)
+            status_old = status
             if status < 0 or status >= 3:
                 break
         if status == 3:
