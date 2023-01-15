@@ -3,4 +3,5 @@
 names_id_dict = {
 b'e6616407e3578c2c': 'pico_emil',
 b'e6614104034a572f': 'pico_hugo',
+b'e6616407e3115431': 'pico_susi',
 }
