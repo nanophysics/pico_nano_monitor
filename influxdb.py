@@ -10,15 +10,18 @@ influxFieldKeyDict= { # Zahlenwerte
     "pressure": "",
     "powerOutage": "",
     "uptime": "",
+    "humidity": "",
 }
 
 influxTagKeyDict= {
-    "unit": ["C", "K", "Pa", "s"],
-    "room": ["B15","B16","B17", "B17"],
-    "setup": ['sofia', 'tabea', 'fritz', 'charlie'],
+    "unit": ["C", "K", "Pa", "s", "%rF"],
+    "room": ["B15","B16","B17", "C17"],
+    "setup": ['sofia', 'tabea', 'fritz', 'charlie', 'broker'],
     "position": "", # z.B. "N2 exhaust tube" 
-    "user": ["pmaerki", "benekrat", "baehler"],
+    "user": ["pmaerki", "benekrat", "baehler", "lostertag"],
     "quality": ["testDeleteLater", "use"],
+    "annotation": "",
+    "title": "",
 }
 
 measurementExample = [{
@@ -117,7 +120,7 @@ def upload_to_influx(measurements):
         result = urequests.post(url, headers=headers, data=payload)
         result.close()
         if result.status_code == 204:  # why 204? we'll never know...
-            print("upload to influxdb success: ", payload)
+            if wlan_helper.logRepl: print("upload to influxdb success: ", payload)
             return "UPLOAD_SUCCESS"
         print(f"  - upload issue ({result.status_code} {result.reason})")
     except Exception as err:

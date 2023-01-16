@@ -18,12 +18,18 @@ status_dict = {
 "-3": "CYW43_LINK_BADAUTH (-3): Verbindungsaufbau abgebrochen, Authentifizierung fehlgeschlagen. Vemutlich WLAN-Passwort falsch."
 } 
 
+logRepl = True # if False: no log to Repl
+
+
 def print_oled(*string):
+    global logRepl
     try:
         oled.printe(''.join(string))
-        print(*string)
+        if logRepl:
+            print(*string)
     except:
-        print(*string)
+        if logRepl:
+            print(*string)
 
 connected = False
 
