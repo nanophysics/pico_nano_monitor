@@ -22,7 +22,7 @@ sensors = ds.scan()
 ds.convert_temp() 		# after power on reset the value is wrong. Therefore measure here once.
 time.sleep_ms(900)     	# mandatory pause to collect results, datasheet max 750 ms
 for s in sensors:
-    ('DS18b20 scanned sensor: \'' + ''.join('%02X' % i for i in iter(s)) + '\'')
+    print('DS18b20 scanned sensor: \'' + ''.join('%02X' % i for i in iter(s)) + '\'')
 
 DS18B20_id_tags = {
     '2847C4660E0000BE': {'position': 'hintenLinks', 'setup':'sofia'},
