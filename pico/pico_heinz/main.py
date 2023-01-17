@@ -7,6 +7,7 @@ import wlan_helper
 import influxdb
 import machine
 
+#wlan_helper.enableWDT()
 wlan_helper.enable_oled() # comment out if there is no oled
 wlan_helper.start_wlan()
 wlan_helper.update_if_local()
