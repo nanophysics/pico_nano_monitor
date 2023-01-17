@@ -39,6 +39,7 @@ def start_wlan():
         status_old = None
         wlan.connect(secret["SSID"], secret["PASSWORD"])
         for max_wait in range(20):
+            feedWDT()
             time.sleep_ms(500)
             status = wlan.status()
             if status != status_old:
@@ -95,6 +96,7 @@ class Senko: # from https://raw.githubusercontent.com/RangerDigital//master/senk
             return False
 
     def _get_file(self, url):
+        feedWDT()
         payload = urequests.get(url, headers=self.headers)
         code = payload.status_code
         if code == 200:
@@ -105,6 +107,7 @@ class Senko: # from https://raw.githubusercontent.com/RangerDigital//master/senk
     def _check_all(self):
         changes = []
         for file in self.files:
+            feedWDT()
             latest_version = self._get_file(self.url + "/" + file)
             if latest_version is None:
                 continue
@@ -123,6 +126,7 @@ class Senko: # from https://raw.githubusercontent.com/RangerDigital//master/senk
     def update(self): #Replace all changed files with newer one. Returns: True - if changes were made, False - if not.
         changes = self._check_all()
         for file in changes:
+            feedWDT()
             with open(file, "w") as local_file:
                 local_file.write(self._get_file(self.url + "/" + file))
         return(len(changes) > 0)
@@ -237,7 +241,8 @@ def update_if_local():
     if runs_from_thonny == False:
         print_oled('main.py is local')
         update_files()
-        update_if_required(files = ["uniq_id_names.py","influxdb.py","oled1.3.py"])
+        print_oled('kkk')
+        update_if_required(files = ["uniq_id_names.py","influxdb.py","oled_1_3.py"])
         enableWDT()
     else:
         print_oled('started: Thonny')
