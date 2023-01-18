@@ -241,7 +241,6 @@ def update_if_local():
     if runs_from_thonny == False:
         print_oled('main.py is local')
         update_files()
-        print_oled('kkk')
         update_if_required(files = ["uniq_id_names.py","influxdb.py","oled_1_3.py"])
         enableWDT()
     else:
