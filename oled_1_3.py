@@ -102,26 +102,43 @@ class OLED_1inch3(framebuf.FrameBuffer):
 
 class OLED(): # zeilenweise rein schreiben und darstellen
     def __init__(self):
-        self.display_strings = []
-        self.OLED = OLED_1inch3()
-        self.linienhoehe = 9
-        self.totalwith = 128
-        self.totalhigh = 64
-        self.lines = self.totalhigh // self.linienhoehe
-        self.chars = self.totalwith // 8-1
-        #self.OLED.fill(0x0000)
-        #self.OLED.show()
+        self._display_strings = []
+        self._OLED = OLED_1inch3()
+        self._linienhoehe = 9
+        self._totalwith = 128
+        self._totalhigh = 64
+        self._lines = self._totalhigh // self._linienhoehe
+        self._chars = self._totalwith // 8-1
+        #self._OLED.fill(0x0000)
+        #self._OLED.show()
+        self._progress = 0.0
 
     def printe(self, string='test'):
-        self.display_strings.insert(0,string[:self.chars])
-        if len(self.display_strings) > self.lines:
-            self.display_strings.pop()
-        self.OLED.fill(0x0000)
-        line = self.lines -1
-        for string in self.display_strings:
-            self.OLED.text(string,1,line*self.linienhoehe,self.OLED.white)
+        self._display_strings.insert(0,string[:self._chars])
+        if len(self._display_strings) > self._lines:
+            self._display_strings.pop()
+        self.__show()
+
+    def progress(self, progress= 0.5): #progress bar 0.0 ... 1.0
+        self._progress = progress
+        self.__show()
+
+    def __show(self):
+        self._OLED.fill(0x0000)
+        line = self._lines -1
+        for string in self._display_strings:
+            self._OLED.text(string,1,line*self._linienhoehe,self._OLED.white)
             line -= 1
-        self.OLED.show()
+        #self._OLED.rect(0,0,128,64,self._OLED.white)
+        #self._OLED.line(0,0,65,64,self._OLED.white)
+        #self._OLED.text('o',121,58,self._OLED.white)
+        #self._OLED.line(127,0,127,63,self._OLED.white)
+        bar = int(self._progress * (self._totalwith))
+        bar = max(bar, 0)
+        bar = min(bar, self._totalwith)
+        if bar > 0:
+            self._OLED.line(0,self._totalhigh-1,bar,self._totalhigh-1,self._OLED.white)
+        self._OLED.show()
 
 if __name__=='__main__':
     oled_peter = OLED()

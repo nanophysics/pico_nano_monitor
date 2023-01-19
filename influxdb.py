@@ -1,69 +1,43 @@
 #https://docs.influxdata.com/influxdb/cloud/reference/key-concepts/data-elements/
 
-#influxMeasurementKeyDict= { # the names of the pico w boards, according to uniq_id_names.py, is automatically added
-#    "pico_hugo": "",
-#    "pico_emil": "",
-#}
-
 influxFieldKeyDict= { # Zahlenwerte
-    "temperature": "",
-    "pressure": "",
-    "powerOutage": "",
-    "uptime": "",
-    "humidity": "",
-}
+    "temperature_C": None,
+    "temperature_K": None,
+    "pressure_Pa_rel": None,
+    "powerOutage_s": None,
+    "uptime_s": None,
+    "humidity_pRH": None,}
 
 influxTagKeyDict= {
-    "unit": ["C", "K", "Pa", "s", "%rF"],
     "room": ["B15","B16","B17", "C17"],
     "setup": ['sofia', 'tabea', 'fritz', 'charlie', 'broker'],
-    "position": "", # z.B. "N2 exhaust tube" 
+    "position": None, # z.B. "N2 exhaust tube" 
     "user": ["pmaerki", "benekrat", "baehler", "lostertag"],
-    "quality": ["testDeleteLater", "use"],
-    "annotation": "",
-    "title": "",
-}
+    "quality": ["testDeleteLater", "use"],}
 
 measurementExample = [{
     'measurement': 'pico_emil', # a measurement has one 'measurement'. It is the name of the pcb.
-    'field': 'temperature', # a measurement has one 'field'.
-    'value': '23.5', # a measurement has one 'value'.
-    'tag': {
-        'unit': 'C',
+    'fields': {
+        'temperature_C': '23.5',
+        'humidity_pRH': '88.2',},
+    'tags': {
         'room': 'B15',
         "position": "hintenLinks",
-        'user': 'pmaerki',
-        },
+        'user': 'pmaerki',},
     },]
         
-def measurementTest(measurements):
+def assert_valid(measurements):
     for measurement in measurements:
-        #if influxMeasurementKeyDict.get(measurement['measurement']) !=  "":
-        #    print(measurement['measurement'], 'is not contained as key in ', influxMeasurementKeyDict)
-        #    return False
-        if influxFieldKeyDict.get(measurement['field']) !=  "":
-            print(measurement['field'], 'is not contained as key in ', influxFieldKeyDict)
-            return False
-        if measurement['value'] ==  None:
-            print(measurement['value'], 'is not contained')
-            return False
-        for key in list(measurement['tag']):
-            predefined = influxTagKeyDict[key]
-            if predefined == "": # free to be defined by user
-                if " " in measurement['tag'][key]:
-                    print('Spaces are not allowed in ', measurement['tag'][key])
-                    return False
+        for field_name in measurement['fields']:
+            assert field_name in influxFieldKeyDict, f"field '{field_name}' is not in {influxFieldKeyDict}"
+        for tag_name, tag_value in measurement['tags'].items():
+            valid_values = influxTagKeyDict[tag_name]
+            if valid_values is None:
                 continue
-            #print('key', key)
-            #print('measurement[\'tag\']', measurement['tag'][key])
-            #print('predefined', predefined)
-            if measurement['tag'][key] in predefined:
-                continue
-            print(measurement['tag'][key], 'is not contained as value in ', "influxTagKeyDict", predefined)
-            return False
-    return True
+            assert tag_value in valid_values, f"{tag_name}={tag_value} is not in {valid_values}"
 
-assert(measurementTest(measurementExample))
+
+assert_valid(measurementExample)
 
 import socket
 import time
@@ -71,7 +45,7 @@ import struct
 import machine
 import urequests
 import secrets
-import wlan_helper
+import utils
 
 def url_encode(t):
   result = ""
@@ -85,48 +59,57 @@ def url_encode(t):
       result += f"%{ord(c):02X}"
   return result
 
-def upload_to_influx(measurements):  
-    bucketName = secrets.influxdb_bucket
-    assert(measurementTest(measurements))
+def upload_to_influx(measurements, credentials = 'peter_influx_com'):  
+    bucketName = secrets.influx_credentials[credentials]['influxdb_bucket']
+    assert_valid(measurements)
     # https://www.alibabacloud.com/help/en/lindorm/latest/write-data-by-using-the-influxdb-line-protocol
     # <table_name>[,<tag_key>=<tag_value>[,<tag_key>=<tag_value>]] <field_key>=<field_value>[,<field_key>=<field_value>] [<timestamp>] 
     # Required: table_name field_set  (timestamp is not required!)
     # https://docs.influxdata.com/influxdb/v2.6/write-data/developer-tools/api/
     #     https://docs.influxdata.com/influxdb/v2.6/api/#operation/PostAuthorizations
 
-    #payload = f"airSensor,sensorId=A0100,station=Harbor humidity=35.0658,{value}"
+    #payload = f"airSensor,sensorId=A0100,station=Harbor humidity=35.0658 temperature=37.2"
+    #payload = f"airSensor,sensorId=A0100,station=Baum humidity=35.0658 temperature=37.2\n"
+    #          f"airSensor uptime_s=1234\n"
     payload = ""
     for measurement in measurements:
         if payload != "":
             payload += "\n"
-        payload += f"{measurement['measurement']}"
-        tags = measurement['tag']
-        for tag in tags:
-            payload += f",{tag}={measurement['tag'][tag]}"
-            
-        #payload += f",board={wlan_helper.boardName}"
-        payload += f" {measurement['field']}={measurement['value']}"
+        payload += measurement['measurement']
+        tags = measurement['tags']
+        for tag, tag_value in tags.items():
+            payload += f",{tag}={tag_value}"
+        fields = measurement['fields']
+        for field_name, field_value in fields.items():
+            payload += f" {field_name}={field_value}"
     
     headers = {
-    "Authorization": f"Token {secrets.influxdb_token}"
+    "Authorization": f"Token {secrets.influx_credentials[credentials]['influxdb_token']}"
     }
 
-    url = secrets.influxdb_url
-    org = secrets.influxdb_org
+    url = secrets.influx_credentials[credentials]['influxdb_url']
+    org = secrets.influx_credentials[credentials]['influxdb_org']
     url += f"/api/v2/write?precision=s&org={url_encode(org)}&bucket={url_encode(bucketName)}"
+
+    if False:
+        result = urequests.get(url='http://ergoinfo.ch/')
+        #result.close()
+        print(result.text)
  
-    try:
-        # post reading data to http endpoint
-        result = urequests.post(url, headers=headers, data=payload)
-        result.close()
-        if result.status_code == 204:  # why 204? we'll never know...
-            if wlan_helper.logRepl: print("upload to influxdb success: ", payload)
-            return "UPLOAD_SUCCESS"
-        print(f"  - upload issue ({result.status_code} {result.reason})")
-    except Exception as err:
-        print(Exception, err)
-        #except:
-        #  print(f"  - an exception occurred when uploading")
-    return "UPLOAD_FAILED"
+    for tries in range(5):
+        utils.wdt.feed()
+        try:
+            # post reading data to http endpoint
+            result = urequests.post(url, headers=headers, data=payload)
+            result.close()
+            if result.status_code == 204:  # why 204? we'll never know...
+                utils.log.log("influx success")
+                utils.log.log_print(payload)
+                return
+            print(f"  - upload issue ({result.status_code} {result.reason})")
+        except Exception as err:
+            print(Exception, err)
+            utils.reset_after_delay()
+
 
 #upload_to_influx(measurementExample)
