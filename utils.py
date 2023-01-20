@@ -4,6 +4,8 @@ import secrets
 import time
 import machine
 import influxdb
+import urequests
+import uhashlib
 class Wlan():
     def __init__(self):
         pass
@@ -42,6 +44,12 @@ class Wlan():
                 log.log(ifconfig[0])
                 connected = True
                 break
+        if False:
+            result = urequests.get('https://ethz.ch/de.html') #'https://www.google.com'
+            print('Good result ist 200 and I got: %s' % result.status_code)
+        if True:
+            result = urequests.get('https://gitlab.phys.ethz.ch/pmaerki/pico_nano_monitor/-/raw/main/test.py') #'https://www.google.com'
+            print(result.text)
         if not connected:   
             log.log("Could not establish a wlan connection")
             reset_after_delay()
@@ -68,18 +76,18 @@ class Log():
         if level_int >= self._levels.get(self._level_print):
             print(*string)
 
-    def oled_progress_bar(self, progress=0.5): #progress bar 0.0 ... 1.0
-        if self._oled:
-            self._oled.progress(progress)
-
     def log_oled(self, *string, level = 'info'):
         if self._oled:
             level_int = self._levels.get(level)
             if level_int == None:
                 print('log level not found:', level)
                 level_int = 0
-            if level_int >= self._levels.get(self._level_print):
+            if level_int >= self._levels.get(self._level_oled):
                 self._oled.printe(''.join(map(str, string)))
+
+    def oled_progress_bar(self, progress=0.5): #progress bar 0.0 ... 1.0
+        if self._oled:
+            self._oled.progress(progress)
 
     def level(self, level_oled = 'info',  level_print = 'trace'):
         self._level_oled = level_oled
@@ -116,8 +124,6 @@ keys = Keys()
     
 log = Log()
 
-import urequests
-import uhashlib
 
 class Senko: # from https://raw.githubusercontent.com/RangerDigital//master/senko/senko.py
     raw = "https://raw.githubusercontent.com"
@@ -323,8 +329,8 @@ class Measurements:
         dict_data['measurement'] = board.get_board_name()
         self.measurements.append(dict_data)
 
-    def upload_to_influx(self):
-        influxdb.upload_to_influx(self.measurements)
+    def upload_to_influx(self, credentials = 'nano_monitor'):
+        influxdb.upload_to_influx(self.measurements, credentials)
         self.measurements = []
 
 mmts = Measurements()

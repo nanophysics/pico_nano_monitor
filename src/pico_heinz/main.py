@@ -11,7 +11,6 @@ utils.log.enable_oled() # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
 
-
 utils.timeManager.set_time_restart_ms(time_restart_ms =  3 * 60 * 60 * 1000) # will reset after this time
 
 from onewire import OneWire
@@ -25,7 +24,7 @@ class DS18b20Tags:
         self._ds.convert_temp() # after power on reset the value is wrong. Therefore measure here once.
         time.sleep_ms(900)  # mandatory pause to collect results, datasheet max 750 ms
         for s in self.sensors:
-            print('DS18b20 scanned sensor: \'' + ''.join('%02X' % i for i in iter(s)) + '\'')
+            utils.log.log('DS18b20 scanned sensor: \'' + ''.join('%02X' % i for i in iter(s)) + '\'')
     
     def tags(self, sensor):
         return self._id_tags.get(''.join('%02X' % i for i in iter(sensor)))
@@ -47,23 +46,6 @@ DS18B20_id_tags = {
     '28D789660E00000A': {'position': 'auf_tisch', 'setup':'charlie'},
     }
 dst = DS18b20Tags(id_tags=DS18B20_id_tags, pin=1)
-
-'''
-key0_was_pressed = False
-key1_was_pressed = False
-def key0_isr(p):
-    global key0_was_pressed
-    key0_was_pressed = True
-def key1_isr(p):
-    global key1_was_pressed
-    key1_was_pressed = True
-key0 = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP)
-key1 = machine.Pin(17, machine.Pin.IN, machine.Pin.PULL_UP)
-key0.irq(trigger=machine.Pin.IRQ_FALLING, handler=key0_isr)
-key1.irq(trigger=machine.Pin.IRQ_FALLING, handler=key1_isr)
-key0_was_pressed = False
-key1_was_pressed = False
-'''
 
 class Adc_5V_GP0:
     def __init__(self):
@@ -135,7 +117,7 @@ while True:
         }})
 
 
-    utils.mmts.upload_to_influx()
+    utils.mmts.upload_to_influx(credentials = 'nano_monitor') # 'peter_influx_com'   'nano_monitor'
     
     while utils.timeManager.need_to_wait(update_period_ms = 60 * 1000):
         utils.board.led_blink_once(time_ms = 50)
