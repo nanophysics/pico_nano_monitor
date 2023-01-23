@@ -1,43 +1,4 @@
-#https://docs.influxdata.com/influxdb/cloud/reference/key-concepts/data-elements/
-
-influxFieldKeyDict= { # Zahlenwerte
-    "temperature_C": None,
-    "temperature_K": None,
-    "pressure_Pa_rel": None,
-    "powerOutage_s": None,
-    "uptime_s": None,
-    "humidity_pRH": None,}
-
-influxTagKeyDict= {
-    "room": ["B15","B16","B17", "C17"],
-    "setup": ['sofia', 'tabea', 'fritz', 'charlie', 'broker'],
-    "position": None, # z.B. "N2 exhaust tube" 
-    "user": ["pmaerki", "benekrat", "baehler", "lostertag"],
-    "quality": ["testDeleteLater", "use"],}
-
-measurementExample = [{
-    'measurement': 'pico_emil', # a measurement has one 'measurement'. It is the name of the pcb.
-    'fields': {
-        'temperature_C': '23.5',
-        'humidity_pRH': '88.2',},
-    'tags': {
-        'room': 'B15',
-        "position": "hintenLinks",
-        'user': 'pmaerki',},
-    },]
-        
-def assert_valid(measurements):
-    for measurement in measurements:
-        for field_name in measurement['fields']:
-            assert field_name in influxFieldKeyDict, f"field '{field_name}' is not in {influxFieldKeyDict}"
-        for tag_name, tag_value in measurement['tags'].items():
-            valid_values = influxTagKeyDict[tag_name]
-            if valid_values is None:
-                continue
-            assert tag_value in valid_values, f"{tag_name}={tag_value} is not in {valid_values}"
-
-
-assert_valid(measurementExample)
+import influxdb_structure
 
 import socket
 import time
@@ -69,6 +30,8 @@ def upload_to_influx(measurements, credentials = 'nano_monitor'):   # 'peter_inf
     #payload = f"airSensor,sensorId=A0100,station=Harbor humidity=35.0658,temperature=37.2"
     #payload = f"airSensor,sensorId=A0100,station=Baum humidity=35.0658,temperature=37.2\n"
     #          f"airSensor uptime_s=1234\n"
+    
+    influxdb_structure.assert_valid(measurements)
     payload = ""
     for measurement in measurements:
         if payload != "":
