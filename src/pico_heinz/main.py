@@ -11,7 +11,7 @@ utils.log.enable_oled() # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
 
-utils.timeManager.set_time_restart_ms(time_restart_ms =  3 * 60 * 60 * 1000) # will reset after this time
+utils.time_manager.set_period_restart_ms(time_restart_ms =  3 * 60 * 60 * 1000) # will reset after this time
 
 from onewire import OneWire
 from ds18x20 import DS18X20
@@ -113,13 +113,13 @@ while True:
     utils.mmts.append({
         'tags': dict_tag,
         'fields': {
-            "uptime_s": "%d" % utils.timeManager.get_time_since_start_s()
+            "uptime_s": "%d" % utils.time_manager.uptime_s()
         }})
 
 
     utils.mmts.upload_to_influx(credentials = 'nano_monitor') # 'peter_influx_com'   'nano_monitor'
     
-    while utils.timeManager.need_to_wait(update_period_ms = 60 * 1000):
+    while utils.time_manager.need_to_wait(update_period_ms = 60 * 1000):
         utils.board.led_blink_once(time_ms = 50)
         time.sleep_ms(500)
 

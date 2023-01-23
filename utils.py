@@ -47,7 +47,7 @@ class Wlan():
         if False:
             result = urequests.get('https://ethz.ch/de.html') #'https://www.google.com'
             print('Good result ist 200 and I got: %s' % result.status_code)
-        if True:
+        if False:
             result = urequests.get('https://gitlab.phys.ethz.ch/pmaerki/pico_nano_monitor/-/raw/main/test.py') #'https://www.google.com'
             print(result.text)
         if not connected:   
@@ -55,73 +55,63 @@ class Wlan():
             reset_after_delay()
 
 wlan=Wlan()
+
+TRACE = 0
+DEBUG = 1
+INFO = 2
+WARN = 3
+ERROR = 4
+FATAL = 5
+
 class Log():
     def __init__(self):
         self._oled_1_3 = False
         self._print = False
-        self._levels = {'trace': 0, 'debug': 1, 'info': 2, 'warn': 3, 'error': 4, 'fatal': 5}
-        self._level_oled = 'info'
-        self._level_print = 'trace'
+        self.level_oled = INFO
+        self.level_print = TRACE
         self._oled = None
 
-    def log(self, *string, level = 'info'):
+    def log(self, *string, level = INFO):
         self.log_print(*string)
         self.log_oled(*string)
     
-    def log_print(self, *string, level = 'info'):
-        level_int = self._levels.get(level)
-        if level_int == None:
-            print('log level not found:', level)
-            level_int = 0
-        if level_int >= self._levels.get(self._level_print):
+    def log_print(self, *string, level = INFO):
+        if level >= self.level_print:
             print(*string)
 
-    def log_oled(self, *string, level = 'info'):
+    def log_oled(self, *string, level = INFO):
         if self._oled:
-            level_int = self._levels.get(level)
-            if level_int == None:
-                print('log level not found:', level)
-                level_int = 0
-            if level_int >= self._levels.get(self._level_oled):
+            if level >= self.level_oled:
                 self._oled.printe(''.join(map(str, string)))
 
     def oled_progress_bar(self, progress=0.5): #progress bar 0.0 ... 1.0
         if self._oled:
             self._oled.progress(progress)
 
-    def level(self, level_oled = 'info',  level_print = 'trace'):
-        self._level_oled = level_oled
-        self._level_print = level_print
-
-    def enable_oled(self, level_oled = 'info',  level_print = 'trace'):
+    def enable_oled(self, level_oled = INFO,  level_print = TRACE):
         import oled_1_3
         self._oled = oled_1_3.OLED()
-        keys.enable()
+        key0.enable()
+        key1.enable()
 
-class Keys:
-    def __init__(self):
-        self._key0 = False
-        self._key1 = False
+class Key:
+    def __init__(self, GPx):
+        self._key = False
+        self._gpx = GPx
     def enable(self):
-        self.key0 = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP)
-        self.key1 = machine.Pin(17, machine.Pin.IN, machine.Pin.PULL_UP)
-        self.key0.irq(trigger=machine.Pin.IRQ_FALLING, handler=self._key0_isr)
-        self.key1.irq(trigger=machine.Pin.IRQ_FALLING, handler=self._key1_isr)
-    def _key0_isr(self, k):
-        self._key0 = True
-    def _key1_isr(self, k):
-        self._key1 = True
-    def get_key0(self):
-        value = self._key0
-        self._key0 = False
+        def _key_isr(k):
+            self._key = True
+        key = machine.Pin(self._gpx, machine.Pin.IN, machine.Pin.PULL_UP)
+        key.irq(trigger=machine.Pin.IRQ_FALLING, handler=_key_isr)
+    def get_key(self):
+        value = self._key
+        self._key = False
         return value
-    def get_key1(self):
-        value = self._key1
-        self._key1 = False
-        return value
-    
-keys = Keys()
-    
+
+key0 = Key(GPx=15)
+key1 = Key(GPx=17)
+
+
 log = Log()
 
 
@@ -150,10 +140,8 @@ class Senko: # from https://raw.githubusercontent.com/RangerDigital//master/senk
         x = x_hash.digest()
         y = y_hash.digest()
 
-        if str(x) == str(y):
-            return True
-        else:
-            return False
+        return str(x) == str(y)
+
     def _get_file(self, url):
         wdt.feed()
         payload = urequests.get(url, headers=self.headers)
@@ -203,6 +191,7 @@ class Board:
         if self._boardName == None:
             print('did not find boardName: Found %s in uniq_id_names.py for key %s' % (self._boardName, unique_id_hex))
             print('-> add unique_id to uniq_id_names.py')
+            assert False
         print('machine.unique_id(): %s found \'%s\''  % ( unique_id_hex, self._boardName))
         self._led = machine.Pin('LED', machine.Pin.OUT)
         try: # test if main.py is on local file system. If so: real system (no development)
@@ -226,24 +215,24 @@ class Board:
 
 board = Board()
 
-class File_updater:
+class FileUpdater:
     def __init__(self):
         pass
     def update_if_local(self):
-        if board.main_is_local == True:
+        if board.main_is_local():
             log.log('check for new files')
-            self.update_if_required(files = ['utils.py'], restart_if_new = True)
-            self.update_if_required(files = ['uniq_id_names.py'])
-            self.update_if_required(folder = "/src/" + board.get_board_name() , files = ["main.py"], restart_if_new = True)
-            self.update_if_required(files = ["uniq_id_names.py","influxdb.py","oled_1_3.py"])
+            self.update_if_changed(files = ['utils.py'], restart_if_new = True)
+            self.update_if_changed(files = ['uniq_id_names.py'])
+            self.update_if_changed(folder = "/src/" + board.get_board_name() , files = ["main.py"], restart_if_new = True)
+            self.update_if_changed(files = ["uniq_id_names.py","influxdb.py","oled_1_3.py"])
             wdt.enable()
-    def update_if_required(self, folder = "", files = [], GITHUB_URL = "https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main", restart_if_new = False):
+    def update_if_changed(self, folder = "", files = [], GITHUB_URL = "https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main", restart_if_new = False):
         # folder is the subfolder in the git project folder folder = "" or folder = "/app"
         # files are copied to the top level of the RP2
         GITHUB_URL = GITHUB_URL + folder
-        OTA = Senko(url=GITHUB_URL , files = files)
+        ota = Senko(url=GITHUB_URL , files = files)
         log.log('Check if there are more actual files on github, if so, do update the local ones. Files: %s' % files)
-        updated = OTA.update()
+        updated = ota.update()
         if updated:
             log.log('Senko: updated git: %s file %s' % (GITHUB_URL, files))
             if restart_if_new:
@@ -252,7 +241,8 @@ class File_updater:
                 reset_after_delay()
         return updated
 
-file_updater = File_updater()
+file_updater = FileUpdater()
+
 class Wdt:
     def __init__(self):
         self._wdt = None
@@ -271,18 +261,16 @@ class TimeManager():
         self._time_start_ms = time.ticks_ms()
         self._time_restart_ms = None
         self._time_next_update_ms = None
-    def get_time_start_ms(self):
-        return self._time_start_ms
     def need_to_wait(self, update_period_ms = 5000): # True if we need to wait
         if not self._time_next_update_ms:
             self._time_next_update_ms = time.ticks_add(self._time_start_ms, update_period_ms)
-        if keys.get_key0(): # extra measurement
+        if key0.get_key(): # extra measurement
             log.log('key0 pressed')
             log.log('extra measure')
             return False
         time_to_wait_ms = time.ticks_diff(self._time_next_update_ms, time.ticks_ms())
         if time_to_wait_ms > 0:
-            if keys.get_key1():
+            if key1.get_key():
                 log.log('key1 pressed')
                 reset_after_delay()
             if self._time_restart_ms:
@@ -292,17 +280,17 @@ class TimeManager():
             log.oled_progress_bar(1.0-time_to_wait_ms / update_period_ms)
             wdt.feed()
             return True
-        log.log('uptime ', timeManager.get_time_since_start_s_str())
+        log.log('uptime ', time_manager.uptime_s_str())
         self._time_next_update_ms = time.ticks_add(self._time_next_update_ms, update_period_ms)
         log.oled_progress_bar(0.0)
         return False
-    def set_time_restart_ms(self, time_restart_ms =  3 * 60 * 60 * 1000): # optional, for periodic restart
+    def set_period_restart_ms(self, time_restart_ms =  3 * 60 * 60 * 1000): # optional, for periodic restart
         self._time_restart_ms = time.ticks_add(time_restart_ms, self._time_start_ms)
-    def get_time_since_start_s(self):
+    def uptime_s(self):
         return time.ticks_diff(time.ticks_ms(), self._time_start_ms)/1000
-    def get_time_since_start_s_str(self):
+    def uptime_s_str(self):
         string = ''
-        s = int(self.get_time_since_start_s())
+        s = int(self.uptime_s())
         seconds = s % 60
         if seconds: string = '%2ds' % seconds + string 
         s = s // 60
@@ -319,7 +307,7 @@ class TimeManager():
         if years: string = '%dy' % years + string 
         return string
 
-timeManager = TimeManager()
+time_manager = TimeManager()
 
 class Measurements:
     def __init__(self):
