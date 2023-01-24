@@ -9,8 +9,11 @@ influxFieldKeyDict= { # Zahlenwerte
     "flow_m3_per_s": None,
     "flow_mol_per_s": None,
     "powerOutage_s": None,
+    "power_W": None,
     "uptime_s": None,
     "binary_state": None, # True False
+    "vibration_peak_AU": None, # Integer
+    "vibration_average_AU": None, # Integer
     "humidity_pRH": None,}
 
 influxTagKeyDict= {
