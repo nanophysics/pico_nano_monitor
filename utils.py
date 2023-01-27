@@ -214,7 +214,7 @@ class Ota_git:
                 log.log(f'updated {file}', level= TRACE)
                 return 1
         else:
-                log.log(f'actual {file}', level= TRACE)
+                log.log(f'actual  {file}', level= TRACE)
                 return 0
             
     def _compare_strings(self, str_local, str_git): # in case we search for strange effects
@@ -300,8 +300,9 @@ class FileUpdater:
                 updates = ota_git.update_file_if_changed(url=GITHUB_URL, file=file)
             dict = board.get_board_dict()
             add_files = dict.get('src_files') # additional files, typically in a subfolder on git
+            remote_folder = dict.get('src_folder')
             for file in add_files:
-                updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file, remote_folder=dict.get('src_folder'))
+                updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file, remote_folder=remote_folder)
             if updates:
                 reset_after_delay()
 
