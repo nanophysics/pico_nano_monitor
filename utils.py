@@ -179,14 +179,14 @@ class Senko: # from https://raw.githubusercontent.com/RangerDigital//master/senk
         return(len(changes) > 0)
 '''
 
-GITHUB_URL = 'https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main'
+GITHUB_URL = 'https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main/'  # use a / at the end
 
 class Ota_git:
     def __init__(self):
         self._headers={}
         
     def _get_remote_file(self, url = '', file = ''):
-        _url = url + "/" + file
+        _url = url + file
         payload = urequests.get(_url, headers=self._headers)
         if payload.status_code != 200:
             return None
@@ -308,7 +308,7 @@ class FileUpdater:
                 for file in add_files:
                     print(file)
                     files.append(dict.get('src_folder')+file)
-            #print('files: ', files)
+            print('files: ', files)
             updates = ota_git.update_files_if_changed(url=GITHUB_URL, files=files)
             if updates:
                 reset_after_delay()
