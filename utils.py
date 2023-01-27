@@ -184,8 +184,8 @@ class Ota_git:
     def __init__(self):
         self._headers={}
         
-    def _get_remote_file(self, url = '', file = ''):
-        _url = url + file
+    def _get_remote_file(self, url = '', remote_folder = '', file = ''):
+        _url = url + remote_folder + file
         payload = urequests.get(_url, headers=self._headers)
         if payload.status_code != 200:
             log.log(f'_get_remote_file ot status_code of {payload.status_code}, _url: {_url}', level = FATAL)
@@ -208,7 +208,7 @@ class Ota_git:
     
     def update_file_if_changed(self, url = '', file='', remote_folder = ''):
         str_local = self._get_local_file(file = file)
-        str_git = self._get_remote_file(url = url, file = file)
+        str_git = self._get_remote_file(url = url, remote_folder = '', file = file)
         if str_local != str_git:
                 f = open(file, "w")
                 f.write(str_git)
