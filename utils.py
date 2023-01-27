@@ -292,8 +292,6 @@ class Board:
 
 board = Board()
 
-
-
 class FileUpdater:
     def __init__(self):
         pass
@@ -303,9 +301,9 @@ class FileUpdater:
             log.log('check for new files', level = TRACE)
             files=['utils.py','uniq_id_names.py','influxdb.py','oled_1_3.py']
             dict = board.get_board_dict()
-            print(dict)
+            #print(dict)
             add_files = dict.get('src_files')
-            print(add_files)
+            #print(add_files)
             if files:
                 for file in add_files:
                     print(file)
@@ -315,35 +313,6 @@ class FileUpdater:
             if updates:
                 reset_after_delay()
 
-'''
-            
-        return self._boardDict.get('name')
-            self.update_if_changed(files = ['utils.py'], restart_if_new = True)
-            self.update_if_changed(files = ['uniq_id_names.py'])
-            self.update_if_changed(folder = "/src/" + board.get_board_name() , files = ["main.py"], restart_if_new = True)
-            self.update_if_changed(files = ["uniq_id_names.py","influxdb.py","oled_1_3.py"])
-            wdt.enable()
-
-    def update_if_changed(self, folder = "", files = [], GITHUB_URL = "https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main", restart_if_new = False):
-        # folder is the subfolder in the git project folder folder = "" or folder = "/app"
-        # files are copied to the top level of the RP2
-        GITHUB_URL = GITHUB_URL + folder
-        ota = Senko(url=GITHUB_URL , files = files)
-        log.log('Check if there are more actual files on github, if so, do update the local ones. Files: %s' % files)
-        updated = ota.update()
-        if updated:
-            log.log('Senko: updated git: %s file %s' % (GITHUB_URL, files))
-            if restart_if_new:
-                log.log('Found new version of %s' % files)
-                log.log('new:%s' % files)
-                reset_after_delay()
-        return updated
-
-    
-
-
-'''
- 
 file_updater = FileUpdater()
 
 class Wdt:
