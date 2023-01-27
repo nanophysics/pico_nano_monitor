@@ -208,7 +208,7 @@ class Ota_git:
     
     def update_file_if_changed(self, url = '', file='', remote_folder = ''):
         str_local = self._get_local_file(file = file)
-        str_git = self._get_remote_file(url = url, remote_folder = '', file = file)
+        str_git = self._get_remote_file(url = url, remote_folder = remote_folder, file = file)
         if str_local != str_git:
                 f = open(file, "w")
                 f.write(str_git)
