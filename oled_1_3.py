@@ -117,13 +117,13 @@ class OLED(): # zeilenweise rein schreiben und darstellen
         self._display_strings.insert(0,string[:self._chars])
         if len(self._display_strings) > self._lines:
             self._display_strings.pop()
-        self.__show()
+        self._show()
 
     def progress(self, progress= 0.5): #progress bar 0.0 ... 1.0
         self._progress = progress
-        self.__show()
+        self._show()
 
-    def __show(self):
+    def _show(self):
         self._OLED.fill(0x0000)
         line = self._lines -1
         for string in self._display_strings:
