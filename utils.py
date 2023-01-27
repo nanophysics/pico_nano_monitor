@@ -219,7 +219,7 @@ class Ota_git:
                         updated += 1
                 else:
                         log.log(f'actual {file}', level= TRACE)
-                return updated
+            return updated
             
     def _compare_strings(self, str_local, str_git): # in case we search for strange effects
         str_local = "".join(c for c in str_local if c != '\r')
