@@ -209,12 +209,6 @@ class Ota_git:
     def update_file_if_changed(self, url = '', file='', remote_folder = ''):
         str_local = self._get_local_file(file = file)
         str_git = self._get_remote_file(url = url, file = file)
-        if str_local  len(str_local) == 0:
-            log.log(f'str_local of {file} has wrong length of {len(str_local)}')
-            reset_after_delay()
-        if len(str_git) == 0:
-            log.log(f'str_local of {file} has wrong length of {len(str_git)}')
-            reset_after_delay()
         if str_local != str_git:
                 f = open(file, "w")
                 f.write(str_git)
