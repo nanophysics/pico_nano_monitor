@@ -188,8 +188,10 @@ class Ota_git:
         _url = url + file
         payload = urequests.get(_url, headers=self._headers)
         if payload.status_code != 200:
+            log.log(f'_get_remote_file ot status_code of {payload.status_code}, _url: {_url}', level = FATAL)
             return None
         if len(payload.text) == 0: # seams to be wrong
+            log.log(f'_get_remote_file len of payload.text was 0, _url: {_url}', level = FATAL)
             return None
         return payload.text
 
@@ -207,7 +209,7 @@ class Ota_git:
     def update_file_if_changed(self, url = '', file='', remote_folder = ''):
         str_local = self._get_local_file(file = file)
         str_git = self._get_remote_file(url = url, file = file)
-        if len(str_local) == 0:
+        if str_local  len(str_local) == 0:
             log.log(f'str_local of {file} has wrong length of {len(str_local)}')
             reset_after_delay()
         if len(str_git) == 0:
