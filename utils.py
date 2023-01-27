@@ -206,20 +206,17 @@ class Ota_git:
         return text
     
     def update_file_if_changed(self, url = '', file='', remote_folder = ''):
-        updated = 0
-        if files:
-            for file in files:
-                str_local = self._get_local_file(file = file)
-                str_git = self._get_remote_file(url = url, file = file)
-                if str_local != str_git:
-                        f = open(file, "w")
-                        f.write(str_git)
-                        f.close
-                        log.log(f'updated {file}', level= TRACE)
-                        updated += 1
-                else:
-                        log.log(f'actual {file}', level= TRACE)
-            return updated
+        str_local = self._get_local_file(file = file)
+        str_git = self._get_remote_file(url = url, file = file)
+        if str_local != str_git:
+                f = open(file, "w")
+                f.write(str_git)
+                f.close
+                log.log(f'updated {file}', level= TRACE)
+                return 1
+        else:
+                log.log(f'actual {file}', level= TRACE)
+                return 0
             
     def _compare_strings(self, str_local, str_git): # in case we search for strange effects
         str_local = "".join(c for c in str_local if c != '\r')
@@ -301,12 +298,11 @@ class FileUpdater:
             log.log('check for new files', level = TRACE)
             files=['utils.py','uniq_id_names.py','influxdb.py','oled_1_3.py']
             for file in files:
-                updates = ota_git.update_file_if_changed(url=GITHUB_URL, files=files)
+                updates = ota_git.update_file_if_changed(url=GITHUB_URL, file=file)
             dict = board.get_board_dict()
             add_files = dict.get('src_files') # additional files, typically in a subfolder on git
-            if files:
-                for file in add_files:
-                    updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file, remote_folder=dict.get('src_folder'))
+            for file in add_files:
+                updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file, remote_folder=dict.get('src_folder'))
             if updates:
                 reset_after_delay()
 
