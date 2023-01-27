@@ -48,6 +48,7 @@ def upload_to_influx(measurements, credentials = 'nano_monitor'):   # 'peter_inf
                 firstfield = False
             else:
                 payload += f",{field_name}={field_value}"
+    utils.log.log_print(payload, level = utils.TRACE)
     
     url = secrets.influx_credentials[credentials]['influxdb_url']
 
@@ -73,7 +74,7 @@ def upload_to_influx(measurements, credentials = 'nano_monitor'):   # 'peter_inf
             result.close()
             if result.status_code == 204:  # why 204? we'll never know...
                 utils.log.log("influx success")
-                utils.log.log_print(payload)
+                #utils.log.log_print(payload)
                 return
             print(f"  - upload issue ({result.status_code} {result.reason})")
         except Exception as err:

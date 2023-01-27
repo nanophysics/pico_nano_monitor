@@ -6,6 +6,9 @@ import machine
 import influxdb
 import urequests
 import uhashlib
+import gc
+
+gc.enable()
 class Wlan():
     def __init__(self):
         pass
@@ -114,7 +117,7 @@ key1 = Key(GPx=17)
 
 log = Log()
 
-
+'''
 class Senko: # from https://raw.githubusercontent.com/RangerDigital//master/senko/senko.py
     raw = "https://raw.githubusercontent.com"
     github = "https://github.com"
@@ -174,6 +177,78 @@ class Senko: # from https://raw.githubusercontent.com/RangerDigital//master/senk
             with open(file, "w") as local_file:
                 local_file.write(self._get_file(self.url + "/" + file))
         return(len(changes) > 0)
+'''
+
+GITHUB_URL = 'https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main'
+
+class Ota_git:
+    def __init__(self):
+        self._headers={}
+        
+    def _get_remote_file(self, url = '', file = ''):
+        _url = url + "/" + file
+        payload = urequests.get(_url, headers=self._headers)
+        if payload.status_code != 200:
+            return None
+        if len(payload.text) == 0: # seams to be wrong
+            return None
+        return payload.text
+
+    def _get_local_file(self, file = ''):
+        f = open(file, "r")
+        try:
+            text = f.read()
+            f.close()
+        except:
+            return None
+        if len(text) == 0: # seams to be wrong
+            return None
+        return text
+    
+    def update_files_if_changed(self, url = '', files=[]):
+        updated = 0
+        if files:
+            for file in files:
+                str_local = self._get_local_file(file = file)
+                str_git = self._get_remote_file(url = url, file = file)
+                if str_local != str_git:
+                        f = open(file, "w")
+                        f.write(str_git)
+                        f.close
+                        log.log(f'updated {file}', level= TRACE)
+                        updated += 1
+                else:
+                        log.log(f'actual {file}', level= TRACE)
+                return updated
+            
+    def _compare_strings(self, str_local, str_git): # in case we search for strange effects
+        str_local = "".join(c for c in str_local if c != '\r')
+        str_local_length = len(str_local)
+        str_git_length = len(str_git)
+        max_length = max(str_local_length, str_git_length)
+        local = None; remote = None
+        counter = 0
+        counter_line = 0
+        counter_char = 0
+        for element in range(0, max_length-1):
+            if element < str_local_length:
+                counter_char += 1
+                local = str_local[element]
+                if local == '\n':
+                    counter_line += 1
+                    counter_char = 0
+                local = repr(local)
+            if element < str_git_length:
+                remote = repr(str_git[element])
+            if local != remote:
+                print(f'Line: {counter_line}, character nr. {counter_char} local: {local} remote: {remote}')
+                counter += 1
+                if counter > 40:
+                    break
+        print(str_local[0:400])
+        print(str_git[0:400])
+        
+ota_git = Ota_git()
 
 def reset_after_delay():
     for counter in range(5, 0, -1):
@@ -187,12 +262,12 @@ class Board:
         import uniq_id_names
         import ubinascii
         unique_id_hex = ubinascii.hexlify(machine.unique_id())
-        self._boardName = uniq_id_names.names_id_dict.get(unique_id_hex)
-        if self._boardName == None:
-            print('did not find boardName: Found %s in uniq_id_names.py for key %s' % (self._boardName, unique_id_hex))
+        self._boardDict = uniq_id_names.names_id_dict.get(unique_id_hex)
+        if self.get_board_name() == None:
+            print('did not find boardName: Found %s in uniq_id_names.py for key %s' % (self.get_board_name(), unique_id_hex))
             print('-> add unique_id to uniq_id_names.py')
             assert False
-        print('machine.unique_id(): %s found \'%s\''  % ( unique_id_hex, self._boardName))
+        print('machine.unique_id(): %s found \'%s\''  % ( unique_id_hex, self.get_board_name()))
         self._led = machine.Pin('LED', machine.Pin.OUT)
         try: # test if main.py is on local file system. If so: real system (no development)
             self._main_is_local = True
@@ -203,7 +278,9 @@ class Board:
             print('main.py not local')
             self._main_is_local = False
     def get_board_name(self):
-        return self._boardName
+        return self._boardDict.get('name')
+    def get_board_dict(self):
+        return self._boardDict
     def set_led(self, value = True):
         self._led.value(value)
     def led_blink_once(self, time_ms = 50):
@@ -215,17 +292,38 @@ class Board:
 
 board = Board()
 
+
+
 class FileUpdater:
     def __init__(self):
         pass
     def update_if_local(self):
+        gc.collect()
         if board.main_is_local():
-            log.log('check for new files')
+            log.log('check for new files', level = TRACE)
+            files=['utils.py','uniq_id_names.py','influxdb.py','oled_1_3.py']
+            dict = board.get_board_dict()
+            print(dict)
+            add_files = dict.get('src_files')
+            print(add_files)
+            if files:
+                for file in add_files:
+                    print(file)
+                    files.append(dict.get('src_folder')+file)
+            #print('files: ', files)
+            updates = ota_git.update_files_if_changed(url=GITHUB_URL, files=files)
+            if updates:
+                reset_after_delay()
+
+'''
+            
+        return self._boardDict.get('name')
             self.update_if_changed(files = ['utils.py'], restart_if_new = True)
             self.update_if_changed(files = ['uniq_id_names.py'])
             self.update_if_changed(folder = "/src/" + board.get_board_name() , files = ["main.py"], restart_if_new = True)
             self.update_if_changed(files = ["uniq_id_names.py","influxdb.py","oled_1_3.py"])
             wdt.enable()
+
     def update_if_changed(self, folder = "", files = [], GITHUB_URL = "https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main", restart_if_new = False):
         # folder is the subfolder in the git project folder folder = "" or folder = "/app"
         # files are copied to the top level of the RP2
@@ -241,6 +339,11 @@ class FileUpdater:
                 reset_after_delay()
         return updated
 
+    
+
+
+'''
+ 
 file_updater = FileUpdater()
 
 class Wdt:
@@ -283,6 +386,8 @@ class TimeManager():
         log.log('uptime ', time_manager.uptime_s_str())
         self._time_next_update_ms = time.ticks_add(self._time_next_update_ms, update_period_ms)
         log.oled_progress_bar(0.0)
+        gc.collect()
+        log.log(f'gc.mem_alloc {gc.mem_alloc():d}, gc.mem_free  {gc.mem_free():d}', level = TRACE)
         return False
     def set_period_restart_ms(self, time_restart_ms =  3 * 60 * 60 * 1000): # optional, for periodic restart
         self._time_restart_ms = time.ticks_add(time_restart_ms, self._time_start_ms)
