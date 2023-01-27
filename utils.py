@@ -205,7 +205,7 @@ class Ota_git:
             return None
         return text
     
-    def update_files_if_changed(self, url = '', files=[]):
+    def update_file_if_changed(self, url = '', file='', remote_folder = ''):
         updated = 0
         if files:
             for file in files:
@@ -300,16 +300,13 @@ class FileUpdater:
         if board.main_is_local():
             log.log('check for new files', level = TRACE)
             files=['utils.py','uniq_id_names.py','influxdb.py','oled_1_3.py']
+            for file in files:
+                updates = ota_git.update_file_if_changed(url=GITHUB_URL, files=files)
             dict = board.get_board_dict()
-            #print(dict)
-            add_files = dict.get('src_files')
-            #print(add_files)
+            add_files = dict.get('src_files') # additional files, typically in a subfolder on git
             if files:
                 for file in add_files:
-                    #print(file)
-                    files.append(dict.get('src_folder')+file)
-            print('files: ', files)
-            updates = ota_git.update_files_if_changed(url=GITHUB_URL, files=files)
+                    updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file, remote_folder=dict.get('src_folder'))
             if updates:
                 reset_after_delay()
 
