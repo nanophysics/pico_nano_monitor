@@ -7,6 +7,7 @@ import influxdb
 import urequests
 import uhashlib
 import gc
+import oled_1_3
 
 gc.enable()
 class Wlan():
@@ -68,7 +69,6 @@ FATAL = 5
 
 class Log():
     def __init__(self):
-        self._oled_1_3 = False
         self._print = False
         self.level_oled = INFO
         self.level_print = TRACE
@@ -92,7 +92,6 @@ class Log():
             self._oled.progress(progress)
 
     def enable_oled(self, level_oled = INFO,  level_print = TRACE):
-        import oled_1_3
         self._oled = oled_1_3.OLED()
         key0.enable()
         key1.enable()

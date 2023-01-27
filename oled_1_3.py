@@ -102,16 +102,15 @@ class OLED_1inch3(framebuf.FrameBuffer):
 
 class OLED(): # zeilenweise rein schreiben und darstellen
     def __init__(self):
-        self._display_strings = []
         self._OLED = OLED_1inch3()
         self._linienhoehe = 9
+        self._display_strings = []
         self._totalwith = 128
         self._totalhigh = 64
         self._lines = self._totalhigh // self._linienhoehe
         self._chars = self._totalwith // 8-1
-        #self._OLED.fill(0x0000)
-        #self._OLED.show()
         self._progress = 0.0
+
 
     def printe(self, string='test'):
         self._display_strings.insert(0,string[:self._chars])
@@ -127,7 +126,7 @@ class OLED(): # zeilenweise rein schreiben und darstellen
         self._OLED.fill(0x0000)
         line = self._lines -1
         for string in self._display_strings:
-            self._OLED.text(string,1,line*self._linienhoehe,self._OLED.white)
+            self._OLED.text(string,1,line * self._linienhoehe, self._OLED.white)
             line -= 1
         #self._OLED.rect(0,0,128,64,self._OLED.white)
         #self._OLED.line(0,0,65,64,self._OLED.white)
