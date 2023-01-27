@@ -112,71 +112,7 @@ class Key:
 
 key0 = Key(GPx=15)
 key1 = Key(GPx=17)
-
-
 log = Log()
-
-'''
-class Senko: # from https://raw.githubusercontent.com/RangerDigital//master/senko/senko.py
-    raw = "https://raw.githubusercontent.com"
-    github = "https://github.com"
-
-    def __init__(self, user=None, repo=None, url=None, branch="master", working_dir="app", files=["boot.py", "main.py"], headers={}):
-        """Senko OTA agent class.
-        Args:
-            user (str): GitHub user.
-            repo (str): GitHub repo to fetch.
-            branch (str): GitHub repo branch. (master)
-            working_dir (str): Directory inside GitHub repo where the micropython app is.
-            url (str): URL to root directory.
-            files (list): Files included in OTA update.
-            headers (list, optional): Headers for urequests.
-        """
-        self.base_url = "{}/{}/{}".format(self.raw, user, repo) if user else url.replace(self.github, self.raw)
-        self.url = url if url is not None else "{}/{}/{}".format(self.base_url, branch, working_dir)
-        self.headers = headers
-        self.files = files
-    def _check_hash(self, x, y):
-        x_hash = uhashlib.sha1(x.encode())
-        y_hash = uhashlib.sha1(y.encode())
-        x = x_hash.digest()
-        y = y_hash.digest()
-
-        return str(x) == str(y)
-
-    def _get_file(self, url):
-        wdt.feed()
-        payload = urequests.get(url, headers=self.headers)
-        code = payload.status_code
-        if code == 200:
-            return payload.text
-        else:
-            return None
-    def _check_all(self):
-        changes = []
-        for file in self.files:
-            wdt.feed()
-            latest_version = self._get_file(self.url + "/" + file)
-            if latest_version is None:
-                continue
-            try:
-                with open(file, "r") as local_file:
-                    local_version = local_file.read()
-            except:
-                local_version = ""
-            if not self._check_hash(latest_version, local_version):
-                changes.append(file)
-        return changes
-    def fetch(self): #Check if newer version is available. Returns: True - if is, False - if not.
-        return(len(self._check_all()) > 0)
-    def update(self): #Replace all changed files with newer one. Returns: True - if changes were made, False - if not.
-        changes = self._check_all()
-        for file in changes:
-            wdt.feed()
-            with open(file, "w") as local_file:
-                local_file.write(self._get_file(self.url + "/" + file))
-        return(len(changes) > 0)
-'''
 
 GITHUB_URL = 'https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main/'  # use a / at the end
 
@@ -387,7 +323,7 @@ class Measurements:
         dict_data['measurement'] = board.get_board_name()
         self.measurements.append(dict_data)
 
-    def upload_to_influx(self, credentials = 'nano_monitor'):
+    def upload_to_influx(self, credentials = 'peter_influx_com'):#'peter_influx_com'  'nano_monitor'
         gc.collect()
         influxdb.upload_to_influx(self.measurements, credentials)
         self.measurements = []
