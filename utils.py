@@ -195,8 +195,8 @@ class Ota_git:
         return payload.text
 
     def _get_local_file(self, file = ''):
-        f = open(file, "r")
         try:
+            f = open(file, "r")
             text = f.read()
             f.close()
         except:
