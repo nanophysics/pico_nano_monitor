@@ -306,7 +306,7 @@ class FileUpdater:
             #print(add_files)
             if files:
                 for file in add_files:
-                    print(file)
+                    #print(file)
                     files.append(dict.get('src_folder')+file)
             print('files: ', files)
             updates = ota_git.update_files_if_changed(url=GITHUB_URL, files=files)
