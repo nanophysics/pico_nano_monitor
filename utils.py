@@ -298,8 +298,9 @@ class FileUpdater:
         if board.main_is_local():
             log.log('check for new files', level = TRACE)
             files=['utils.py','uniq_id_names.py','influxdb.py','oled_1_3.py']
+            updates = 0
             for file in files:
-                updates = ota_git.update_file_if_changed(url=GITHUB_URL, file=file)
+                updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file)
             dict = board.get_board_dict()
             add_files = dict.get('src_files') # additional files, typically in a subfolder on git
             remote_folder = dict.get('src_folder')
