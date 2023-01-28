@@ -3,7 +3,7 @@
 names_id_dict = {
 b'e6616407e3578c2c': dict(name='pico_emil', src_folder='src/pico_emil/', src_files=['main.py',]),
 b'e6614104034a572f': dict(name='pico_hugo', src_folder='src/pico_hugo/', src_files=['main.py',]),
-b'e6616407e3115431': dict(name='pico_susi', src_folder='src/pico_susi/', src_files=['main.py',]),
 b'e661640843604922': dict(name='pico_heinz', src_folder='src/pico_heinz/', src_files=['main.py',]),
 b'e661640843866028': dict(name='pico_rahel', src_folder='src/vibration_temperature/', src_files=['main.py', 'config.py']),
+b'e6616407e3115431': dict(name='pico_susi', src_folder='src/vibration_temperature/', src_files=['main.py', 'config.py']),
 }

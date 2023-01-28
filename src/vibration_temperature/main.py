@@ -28,6 +28,8 @@ first_measurement = True
 from onewire import OneWire
 from ds18x20 import DS18X20
 
+pico_tags = config.pico_tags.get(utils.board.get_board_name())
+
 class Vibration:
     def __init__(self):
         self._sig_counter = 0
@@ -65,10 +67,10 @@ class Vibration:
         self._doReset = True
         return sig_peak_float, sig_average_float
 
-tim1 = machine.Timer(-1)
-
-vibration = Vibration()
-tim1.init(period=1, mode=tim1.PERIODIC, callback=vibration.process_isr)
+if pico_tags.get('vibration'):
+    tim1 = machine.Timer(-1)
+    vibration = Vibration()
+    tim1.init(period=1, mode=tim1.PERIODIC, callback=vibration.process_isr)
 
 class DS18b20Tags:
     def __init__(self, id_tags, pin=1):
@@ -98,7 +100,6 @@ class DS18b20Tags:
         return "%0.2f" % temperatureC
 
 
-pico_tags = config.pico_tags.get(utils.board.get_board_name())
 DS18B20_id_tags = pico_tags.get('DS18B20_id_tags')
 
 dst = DS18b20Tags(id_tags=DS18B20_id_tags, pin=1)
@@ -107,10 +108,11 @@ dst = DS18b20Tags(id_tags=DS18B20_id_tags, pin=1)
 while True:
     utils.board.set_led(value = 1)
     dst.do_measure()
-    sig_peak_float, sig_average_float = vibration.getPeakAverage()
-    #print('sig %d, ref %d, diff %d, peak %d, average %0.2f, counter %d' %  (vibration._sig_sig_measure, vibration._sig_ref_measure,vibration._sig_abs_difference,vibration._sig_peak,vibration._sig_average, vibration._sig_counter))
-    utils.log.log(f'vib peak {sig_peak_float:.4f}')
-    utils.log.log(f'vib aver {sig_average_float:.4f}')
+    if pico_tags.get('vibration'):
+        sig_peak_float, sig_average_float = vibration.getPeakAverage()
+        #print('sig %d, ref %d, diff %d, peak %d, average %0.2f, counter %d' %  (vibration._sig_sig_measure, vibration._sig_ref_measure,vibration._sig_abs_difference,vibration._sig_peak,vibration._sig_average, vibration._sig_counter))
+        utils.log.log(f'vib peak {sig_peak_float:.4f}')
+        utils.log.log(f'vib aver {sig_average_float:.4f}')
     dict_tag = pico_tags.get('general')
     for sensor in dst.sensors:
         DS_dict = dst.tags(sensor)
@@ -120,7 +122,7 @@ while True:
             'fields': {
                 "temperature_C": dst.measure_influx(sensor)
             }})
-    if first_measurement: # vibration depends on measurement duration. Skip first measurement.
+    if first_measurement or not pico_tags.get('vibration'): # vibration depends on measurement duration. Skip first measurement.
         first_measurement = False
     else:
         utils.mmts.append({
@@ -136,7 +138,7 @@ while True:
         }})
     
     #print(utils.mmts.measurements)
-    utils.mmts.upload_to_influx(credentials = 'nano_monitor') # 'peter_influx_com'   'nano_monitor'
+    utils.mmts.upload_to_influx(credentials = 'peter_influx_com') # 'peter_influx_com'   'nano_monitor'
     
     while utils.time_manager.need_to_wait(update_period_ms = 60 * 1000):
         utils.board.led_blink_once(time_ms = 50)
