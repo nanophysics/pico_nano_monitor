@@ -78,8 +78,8 @@ class Log():
         self._oled = None
 
     def log(self, *string, level = INFO):
-        self.log_print(*string)
-        self.log_oled(*string)
+        self.log_print(*string, level = level)
+        self.log_oled(*string, level = level)
     
     def log_print(self, *string, level = INFO):
         if level >= self.level_print:
