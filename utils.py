@@ -124,7 +124,7 @@ class Ota_git:
         _url = url + remote_folder + file
         payload = urequests.get(_url, headers=self._headers)
         if payload.status_code != 200:
-            log.log(f'_get_remote_file ot status_code of {payload.status_code}, _url: {_url}', level = FATAL)
+            log.log(f'_get_remote_file got status_code of {payload.status_code}, _url: {_url}', level = FATAL)
             return None
         if len(payload.text) == 0: # seams to be wrong
             log.log(f'_get_remote_file len of payload.text was 0, _url: {_url}', level = FATAL)
@@ -389,8 +389,6 @@ class Measurements:
                 result.close()
                 if result.status_code == 204:  # why 204? we'll never know...
                     log.log("influx success")
-                    #log.log_print(payload)
-                    return
                 print(f"  - upload issue ({result.status_code} {result.reason})")
             except Exception as err:
                 log.log(Exception, err)
