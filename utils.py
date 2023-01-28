@@ -393,7 +393,7 @@ class Measurements:
                 result.close()
                 if result.status_code == 204:  # why 204? we'll never know...
                     log.log("influx success")
-                print(f"  - upload issue ({result.status_code} {result.reason})")
+                    print(f"  - upload issue ({result.status_code} {result.reason})")
             except Exception as err:
                 log.log(Exception, err)
                 log.log('Could not upload')
