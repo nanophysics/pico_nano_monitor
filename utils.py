@@ -14,8 +14,8 @@ class Wlan():
     def __init__(self):
         pass
     def start_wlan(self, credentials = 'default'):
-        log.log('pico_nano_monitor')
         log.log('ETHZ 2023')
+        log.log('pico_nano_monitor')
         log.log('')
         log.log(' -> ', board.get_board_name())
         rp2.country('CH')
@@ -153,10 +153,10 @@ class Ota_git:
                 f = open(file, "w")
                 f.write(str_git)
                 f.close
-                log.log(f'updated {file}', level= TRACE)
+                log.log(f'new:{file}', level= TRACE)
                 return 1
         else:
-                log.log(f'actual  {file}', level= TRACE)
+                log.log(f'ok :{file}', level= TRACE)
                 return 0
             
     def _compare_strings(self, str_local, str_git): # in case we search for strange effects
