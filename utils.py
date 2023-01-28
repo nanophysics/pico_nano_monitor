@@ -194,7 +194,7 @@ class FileUpdater:
     def update_if_local(self):
         gc.collect()
         if board.main_is_local():
-            log.log('check:new files?', level = TRACE)
+            log.log('new files?', level = TRACE)
             files=['utils.py','uniq_id_names.py','oled_1_3.py']
             updates = 0
             for file in files:
@@ -393,6 +393,7 @@ class Measurements:
                 result.close()
                 if result.status_code == 204:  # why 204? we'll never know...
                     log.log("influx success")
+                    break
                 else:
                     print(f"  - upload issue ({result.status_code} {result.reason})")
             except Exception as err:
