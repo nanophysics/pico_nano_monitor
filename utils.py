@@ -323,7 +323,7 @@ class Measurements:
         dict_data['measurement'] = board.get_board_name()
         self.measurements.append(dict_data)
 
-    def upload_to_influx(self, credentials = 'peter_influx_com'):#'peter_influx_com'  'nano_monitor'
+    def upload_to_influx(self, credentials = 'nano_monitor'):
         gc.collect()
         influxdb.upload_to_influx(self.measurements, credentials)
         self.measurements = []

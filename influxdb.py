@@ -20,9 +20,7 @@ def url_encode(t):
       result += f"%{ord(c):02X}"
   return result
 
-influx_credentials = 'nano_monitor' # 'nano_monitor',  'peter_influx_com'
-
-def upload_to_influx(measurements, credentials =  influx_credentials):   # 'peter_influx_com'
+def upload_to_influx(measurements, credentials =  ''):   # 'nano_monitor',  'peter_influx_com'
     # https://www.alibabacloud.com/help/en/lindorm/latest/write-data-by-using-the-influxdb-line-protocol
     # <table_name>[,<tag_key>=<tag_value>[,<tag_key>=<tag_value>]] <field_key>=<field_value>[,<field_key>=<field_value>] [<timestamp>] 
     # Required: table_name field_set  (timestamp is not required!)
@@ -53,6 +51,7 @@ def upload_to_influx(measurements, credentials =  influx_credentials):   # 'pete
     utils.log.log_print(payload, level = utils.TRACE)
     
     url = secrets.influx_credentials[credentials]['influxdb_url']
+    print(url)
 
     for tries in range(2):
         utils.wdt.feed()

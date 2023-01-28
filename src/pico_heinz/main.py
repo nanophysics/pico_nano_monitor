@@ -10,8 +10,8 @@ import utils
 utils.log.enable_oled() # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
-import influx_db
-influx_db.influx_credentials = 'peter_influx_com'
+import influxdb
+influxdb.influx_credentials = 'peter_influx_com'
 
 utils.time_manager.set_period_restart_ms(time_restart_ms =  3 * 60 * 60 * 1000) # will reset after this time
 
@@ -119,7 +119,7 @@ while True:
         }})
 
 
-    utils.mmts.upload_to_influx(credentials = 'nano_monitor') # 'peter_influx_com'   'nano_monitor'
+    utils.mmts.upload_to_influx(credentials = 'peter_influx_com') # 'peter_influx_com' ,  'nano_monitor'
     
     while utils.time_manager.need_to_wait(update_period_ms = 60 * 1000):
         utils.board.led_blink_once(time_ms = 50)
