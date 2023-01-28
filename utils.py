@@ -3,11 +3,11 @@ import network
 import secrets
 import time
 import machine
-import influxdb
 import urequests
 import uhashlib
 import gc
 import oled_1_3
+import influxdb_structure
 
 gc.enable()
 class Wlan():
@@ -184,6 +184,27 @@ class Ota_git:
         
 ota_git = Ota_git()
 
+class FileUpdater:
+    def __init__(self):
+        pass
+    def update_if_local(self):
+        gc.collect()
+        if board.main_is_local():
+            log.log('check for new files', level = TRACE)
+            files=['utils.py','uniq_id_names.py','influxdb.py','oled_1_3.py']
+            updates = 0
+            for file in files:
+                updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file)
+            dict = board.get_board_dict()
+            add_files = dict.get('src_files') # additional files, typically in a subfolder on git
+            remote_folder = dict.get('src_folder')
+            for file in add_files:
+                updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file, remote_folder=remote_folder)
+            if updates:
+                reset_after_delay()
+
+file_updater = FileUpdater()
+
 def reset_after_delay():
     for counter in range(5, 0, -1):
         log.log("reboot in %d s" % counter)
@@ -225,27 +246,6 @@ class Board:
         return self._main_is_local
 
 board = Board()
-
-class FileUpdater:
-    def __init__(self):
-        pass
-    def update_if_local(self):
-        gc.collect()
-        if board.main_is_local():
-            log.log('check for new files', level = TRACE)
-            files=['utils.py','uniq_id_names.py','influxdb.py','oled_1_3.py']
-            updates = 0
-            for file in files:
-                updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file)
-            dict = board.get_board_dict()
-            add_files = dict.get('src_files') # additional files, typically in a subfolder on git
-            remote_folder = dict.get('src_folder')
-            for file in add_files:
-                updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file, remote_folder=remote_folder)
-            if updates:
-                reset_after_delay()
-
-file_updater = FileUpdater()
 
 class Wdt:
     def __init__(self):
@@ -315,6 +315,20 @@ class TimeManager():
 
 time_manager = TimeManager()
 
+
+
+def url_encode(t):
+  result = ""
+  for c in t:
+    # no encoding needed for character
+    if c.isalpha() or c.isdigit() or c in ["-", "_", "."]:
+      result += c
+    elif c == " ":
+      result += "+"
+    else:
+      result += f"%{ord(c):02X}"
+  return result
+
 class Measurements:
     def __init__(self):
         self.measurements = []
@@ -325,7 +339,63 @@ class Measurements:
 
     def upload_to_influx(self, credentials = 'nano_monitor'):
         gc.collect()
-        influxdb.upload_to_influx(self.measurements, credentials)
+        # upload_to_influx(self.measurements, credentials)
+            # https://www.alibabacloud.com/help/en/lindorm/latest/write-data-by-using-the-influxdb-line-protocol
+    # <table_name>[,<tag_key>=<tag_value>[,<tag_key>=<tag_value>]] <field_key>=<field_value>[,<field_key>=<field_value>] [<timestamp>] 
+    # Required: table_name field_set  (timestamp is not required!)
+    # https://docs.influxdata.com/influxdb/v2.6/write-data/developer-tools/api/
+    #     https://docs.influxdata.com/influxdb/v2.6/api/#operation/PostAuthorizations
+
+    #payload = f"airSensor,sensorId=A0100,station=Harbor humidity=35.0658,temperature=37.2"
+    #payload = f"airSensor,sensorId=A0100,station=Baum humidity=35.0658,temperature=37.2\n"
+    #          f"airSensor uptime_s=1234\n"
+    
+        influxdb_structure.assert_valid(self.measurements)
+        payload = ""
+        for measurement in self.measurements:
+            if payload != "":
+                payload += "\n"
+            payload += measurement['measurement']
+            tags = measurement['tags']
+            for tag, tag_value in tags.items():
+                payload += f",{tag}={tag_value}"
+            fields = measurement['fields']
+            firstfield = True
+            for field_name, field_value in fields.items():
+                if firstfield:
+                    payload += f" {field_name}={field_value}"
+                    firstfield = False
+                else:
+                    payload += f",{field_name}={field_value}"
+        log.log_print(payload, level = TRACE)
+        url = secrets.influx_credentials[credentials]['influxdb_url']
+        for tries in range(2):
+            wdt.feed()
+            try:
+                if secrets.influx_credentials[credentials].get('influxdb_pass'): # authentication old
+                    db_name = secrets.influx_credentials[credentials].get('influxdb_db_name')
+                    auth=(secrets.influx_credentials[credentials].get('influxdb_user'), secrets.influx_credentials[credentials].get('influxdb_pass'))
+                    #print(url + f'/write?db={db_name}')#, data = payload, auth=auth)
+                    #print(auth)
+                    result = urequests.post(url + f'/write?db={db_name}', data = payload, auth=auth)
+                if secrets.influx_credentials[credentials].get('influxdb_token'): # authentication new influxdb.com
+                    bucketName = secrets.influx_credentials[credentials]['influxdb_bucket']
+                    headers = {
+                    "Authorization": f"Token {secrets.influx_credentials[credentials]['influxdb_token']}"
+                    }
+                    org = secrets.influx_credentials[credentials]['influxdb_org']
+                    url += f"/api/v2/write?precision=s&org={url_encode(org)}&bucket={url_encode(bucketName)}"
+                    result = urequests.post(url, headers=headers, data=payload)
+                result.close()
+                if result.status_code == 204:  # why 204? we'll never know...
+                    log.log("influx success")
+                    #log.log_print(payload)
+                    return
+                print(f"  - upload issue ({result.status_code} {result.reason})")
+            except Exception as err:
+                log.log(Exception, err)
+                log.log('Could not upload')
+                reset_after_delay()
         self.measurements = []
 
 mmts = Measurements()
