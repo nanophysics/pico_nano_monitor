@@ -194,7 +194,7 @@ class FileUpdater:
     def update_if_local(self):
         gc.collect()
         if board.main_is_local():
-            log.log('check for new files', level = TRACE)
+            log.log('check:new files?', level = TRACE)
             files=['utils.py','uniq_id_names.py','oled_1_3.py']
             updates = 0
             for file in files:
