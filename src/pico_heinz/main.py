@@ -10,6 +10,8 @@ import utils
 utils.log.enable_oled() # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
+import influx_db
+influx_db.influx_credentials = 'peter_influx_com'
 
 utils.time_manager.set_period_restart_ms(time_restart_ms =  3 * 60 * 60 * 1000) # will reset after this time
 
