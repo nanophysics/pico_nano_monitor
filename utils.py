@@ -125,10 +125,10 @@ class Ota_git:
         payload = urequests.get(_url, headers=self._headers)
         if payload.status_code != 200:
             log.log(f'_get_remote_file got status_code of {payload.status_code}, _url: {_url}', level = FATAL)
-            return None
+            reset_after_delay()
         if len(payload.text) == 0: # seams to be wrong
             log.log(f'_get_remote_file len of payload.text was 0, _url: {_url}', level = FATAL)
-            return None
+            reset_after_delay()
         return payload.text
 
     def _get_local_file(self, file = ''):
@@ -137,9 +137,10 @@ class Ota_git:
             text = f.read()
             f.close()
         except:
-            return None
+            log.log(f'could not open local file: {file}', level = TRACE) # could be the file does not exist
+            return ''
         if len(text) == 0: # seams to be wrong
-            return None
+            return ''
         return text
     
     def update_file_if_changed(self, url = '', file='', remote_folder = ''):
@@ -191,7 +192,7 @@ class FileUpdater:
         gc.collect()
         if board.main_is_local():
             log.log('check for new files', level = TRACE)
-            files=['utils.py','uniq_id_names.py','influxdb.py','oled_1_3.py']
+            files=['utils.py','uniq_id_names.py','oled_1_3.py']
             updates = 0
             for file in files:
                 updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file)
