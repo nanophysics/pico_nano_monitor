@@ -14,6 +14,9 @@ class Wlan():
     def __init__(self):
         pass
     def start_wlan(self, credentials = 'default'):
+        log.log('pico_nano_monitor')
+        log.log('ETHZ 2023')
+        log.log('')
         log.log(' -> ', board.get_board_name())
         rp2.country('CH')
         self.wlan = network.WLAN(network.STA_IF)
@@ -398,7 +401,3 @@ class Measurements:
         self.measurements = []
 
 mmts = Measurements()
-
-log.log('pico_nano_monitor')
-log.log('ETHZ 2023')
-log.log('')
