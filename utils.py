@@ -399,3 +399,7 @@ class Measurements:
         self.measurements = []
 
 mmts = Measurements()
+
+log.log('pico_nano_monitor')
+log.log('ETHZ 2023')
+log.log('')
