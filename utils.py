@@ -14,6 +14,7 @@ class Wlan():
     def __init__(self):
         pass
     def start_wlan(self, credentials = 'default'):
+        wdt.feed()
         log.log('ETHZ 2023')
         log.log('pico_nano_monitor')
         log.log(' -> ', board.get_board_name())
@@ -123,6 +124,7 @@ class Ota_git:
         self._headers={}
         
     def _get_remote_file(self, url = '', remote_folder = '', file = ''):
+        wdt.feed()
         _url = url + remote_folder + file
         payload = urequests.get(_url, headers=self._headers)
         if payload.status_code != 200:
@@ -134,6 +136,7 @@ class Ota_git:
         return payload.text
 
     def _get_local_file(self, file = ''):
+        wdt.feed()
         try:
             f = open(file, "r")
             text = f.read()
@@ -149,6 +152,7 @@ class Ota_git:
         str_local = self._get_local_file(file = file)
         str_git = self._get_remote_file(url = url, remote_folder = remote_folder, file = file)
         if str_local != str_git:
+                wdt.feed()
                 f = open(file, "w")
                 f.write(str_git)
                 f.close
@@ -254,13 +258,24 @@ board = Board()
 class Wdt:
     def __init__(self):
         self._wdt = None
+        self._monitor_last_wdt_ms = time.ticks_ms()
+        self._timeout=8300
     
     def enable(self):
-        self._wdt = machine.WDT(timeout=8300) # The maximum value for timeout is 8388 ms.
+        if board.main_is_local:
+            self._wdt = machine.WDT(timeout=self._timeout) # The maximum value for timeout is 8388 ms.
+            log.log(f'Wdt is enabled; timeout = {self._timeout:d} ms', level = TRACE)
+            self._monitor_last_wdt_ms = time.ticks_ms()
     
     def feed(self):
         if self._wdt:
             self._wdt.feed()
+        time_since_last_feed = time.ticks_diff(time.ticks_ms(), self._monitor_last_wdt_ms)
+        self._monitor_last_wdt_ms = time.ticks_ms()
+        msg = f'Wdt feed, {time_since_last_feed:d} ms elapsed, timeout {self._timeout:d} ms, enabled = {self._wdt != None}'
+        if time_since_last_feed > 3000:
+            log.log(msg, level = TRACE)
+        return time_since_last_feed
 
 wdt = Wdt()
 

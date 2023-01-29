@@ -11,7 +11,7 @@ import random
 import micropython
 micropython.alloc_emergency_exception_buf(100)
 
-#utils.wdt.enable()
+utils.wdt.enable()
 utils.log.enable_oled() # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()

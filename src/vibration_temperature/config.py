@@ -8,7 +8,7 @@ pico_tags ={
     'DS18B20_id_tags': {},
     'vibration': False},
     'pico_mia': {
-    'general': {'room': 'B15', 'position': 'susipos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
+    'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {},
     'vibration': False},
 }
