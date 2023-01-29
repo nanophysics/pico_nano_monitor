@@ -6,6 +6,7 @@ import time
 import machine
 import utils
 import config
+import random
 
 import micropython
 micropython.alloc_emergency_exception_buf(100)
@@ -15,13 +16,8 @@ utils.log.enable_oled() # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
 
-if False:
-    urltext = 'https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main/uniq_id_names.py'
-    print(urltext)
-    result = utils.urequests.get(urltext) #'https://www.google.com'
-    print(result.text)
-
-utils.time_manager.set_period_restart_ms(time_restart_ms =  3 * 60 * 60 * 1000) # will reset after this time
+minute_ms = 60*1000; hour_ms = 60*minute_ms
+utils.time_manager.set_period_restart_ms(time_restart_ms =  3 * hour_ms + random.randrange(20*minute_ms)) # will reset after this time
 
 first_measurement = True
 

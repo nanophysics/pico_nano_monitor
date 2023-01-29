@@ -288,7 +288,7 @@ class TimeManager():
             log.oled_progress_bar(1.0-time_to_wait_ms / update_period_ms)
             wdt.feed()
             return True
-        log.log('uptime ', time_manager.uptime_s_str())
+        log.log('uptime ', time_manager.uptime_s_str(self.uptime_s()))
         self._time_next_update_ms = time.ticks_add(self._time_next_update_ms, update_period_ms)
         log.oled_progress_bar(0.0)
         gc.collect()
@@ -296,11 +296,12 @@ class TimeManager():
         return False
     def set_period_restart_ms(self, time_restart_ms =  3 * 60 * 60 * 1000): # optional, for periodic restart
         self._time_restart_ms = time.ticks_add(time_restart_ms, self._time_start_ms)
+        log.log(f'will restart automatically after {self.uptime_s_str(time_restart_ms/1000)}', level = TRACE)
     def uptime_s(self):
         return time.ticks_diff(time.ticks_ms(), self._time_start_ms)/1000
-    def uptime_s_str(self):
+    def uptime_s_str(self, time_s):
         string = ''
-        s = int(self.uptime_s())
+        s = int(time_s)
         seconds = s % 60
         if seconds: string = '%2ds' % seconds + string 
         s = s // 60

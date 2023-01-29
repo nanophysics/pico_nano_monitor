@@ -5,13 +5,15 @@ for final use: put main.py on RP2
 import time
 import machine
 import utils
+import random
 
 #utils.wdt.enable()
 utils.log.enable_oled() # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
 
-utils.time_manager.set_period_restart_ms(time_restart_ms =  3 * 60 * 60 * 1000) # will reset after this time
+minute_ms = 60*1000; hour_ms = 60*minute_ms
+utils.time_manager.set_period_restart_ms(time_restart_ms =  3 * hour_ms + random.randrange(10*minute_ms)) # will reset after this time
 
 from onewire import OneWire
 from ds18x20 import DS18X20
