@@ -276,7 +276,7 @@ class Wdt:
         time_since_last_feed = time.ticks_diff(time.ticks_ms(), self._monitor_last_wdt_ms)
         self._monitor_last_wdt_ms = time.ticks_ms()
         msg = f'Wdt feed, {time_since_last_feed:d} ms elapsed, timeout {self._timeout:d} ms, enabled = {self._wdt != None}'
-        if time_since_last_feed > 3000:
+        if time_since_last_feed > 4000:
             log.log(msg, level = INFO)
         return time_since_last_feed
 
