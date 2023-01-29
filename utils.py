@@ -1,3 +1,6 @@
+# 2023 Peter Maerki
+# Common functions for RP2 Pico w baords.
+
 import rp2
 import network
 import secrets

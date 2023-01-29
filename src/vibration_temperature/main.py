@@ -17,7 +17,7 @@ utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
 
 minute_ms = 60*1000; hour_ms = 60*minute_ms
-utils.time_manager.set_period_restart_ms(time_restart_ms =  3 * hour_ms + random.randrange(20*minute_ms)) # will reset after this time
+utils.time_manager.set_period_restart_ms(time_restart_ms =  3 * hour_ms + random.randrange(10*minute_ms)) # will reset after this time
 
 first_measurement = True
 
@@ -137,7 +137,7 @@ while True:
     #print(utils.mmts.measurements)
     utils.mmts.upload_to_influx(credentials = 'peter_influx_com') # 'peter_influx_com'   'nano_monitor'
     
-    while utils.time_manager.need_to_wait(update_period_ms = 60 * 1000):
+    while utils.time_manager.need_to_wait(update_period_ms = 10 * minute_ms):
         utils.board.led_blink_once(time_ms = 50)
         time.sleep_ms(500)
 
