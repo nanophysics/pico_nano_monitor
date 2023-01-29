@@ -24,7 +24,9 @@ first_measurement = True
 from onewire import OneWire
 from ds18x20 import DS18X20
 
+msg = f'config.py has no entry for \'{utils.board.get_board_name():s}\'. Complement this file.' 
 pico_tags = config.pico_tags.get(utils.board.get_board_name())
+assert pico_tags != None, msg
 
 class Vibration:
     def __init__(self):
@@ -94,7 +96,6 @@ class DS18b20Tags:
         temperatureC = self._ds.read_temp(sensor)
         utils.log.log('%0.2f C' % temperatureC)
         return "%0.2f" % temperatureC
-
 
 DS18B20_id_tags = pico_tags.get('DS18B20_id_tags')
 

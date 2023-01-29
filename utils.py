@@ -16,7 +16,6 @@ class Wlan():
     def start_wlan(self, credentials = 'default'):
         log.log('ETHZ 2023')
         log.log('pico_nano_monitor')
-        log.log('')
         log.log(' -> ', board.get_board_name())
         rp2.country('CH')
         self.wlan = network.WLAN(network.STA_IF)
@@ -222,10 +221,11 @@ class Board:
         import ubinascii
         unique_id_hex = ubinascii.hexlify(machine.unique_id())
         self._boardDict = uniq_id_names.names_id_dict.get(unique_id_hex)
-        if self.get_board_name() == None:
-            print('did not find boardName: Found %s in uniq_id_names.py for key %s' % (self.get_board_name(), unique_id_hex))
-            print('-> add unique_id to uniq_id_names.py')
-            assert False
+        if self.get_board_dict() == None:
+            print(f'did not find boardName: No value for key \'{unique_id_hex:s}\'')
+            msg = f'-> add unique_id \'{unique_id_hex:s}\' to uniq_id_names.py'
+            print(msg)
+            assert False, msg
         print('machine.unique_id(): %s found \'%s\''  % ( unique_id_hex, self.get_board_name()))
         self._led = machine.Pin('LED', machine.Pin.OUT)
         try: # test if main.py is on local file system. If so: real system (no development)
