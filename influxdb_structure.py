@@ -46,3 +46,7 @@ def assert_valid(measurements):
 
 
 assert_valid(measurementExample)
+
+
+if __name__=='__main__':
+    print(measurementExample)
