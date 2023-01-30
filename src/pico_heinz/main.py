@@ -122,8 +122,7 @@ while True:
     utils.mmts.upload_to_influx(credentials = 'peter_influx_com') # 'peter_influx_com' ,  'nano_monitor'
     
     while utils.time_manager.need_to_wait(update_period_ms = 10 * minute_ms):
-        utils.board.led_blink_once(time_ms = 50)
-        time.sleep_ms(500)
+        pass
 
 
         

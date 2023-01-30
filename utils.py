@@ -307,7 +307,7 @@ class TimeManager():
         self._time_start_ms = time.ticks_ms()
         self._time_restart_ms = None
         self._time_next_update_ms = None
-    def need_to_wait(self, update_period_ms = 5000): # True if we need to wait
+    def need_to_wait(self, update_period_ms = 5000): # Waits for 1000ms if we need to wait. Returns True if we need to wait.
         if not self._time_next_update_ms:
             self._time_next_update_ms = time.ticks_add(self._time_start_ms, update_period_ms)
         if key0.get_key(): # extra measurement
@@ -324,6 +324,9 @@ class TimeManager():
                     log.log('It is time to restart as the time period time_restart_ms is over.')
                     reset_after_delay()
             log.oled_progress_bar(1.0-time_to_wait_ms / update_period_ms)
+            wdt.feed()
+            board.led_blink_once(time_ms = 50)
+            time.sleep_ms(1000-50)
             wdt.feed()
             return True
         log.log('uptime ', time_manager.uptime_s_str(self.uptime_s()))
