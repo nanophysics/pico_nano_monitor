@@ -11,6 +11,7 @@ import uhashlib
 import gc
 import oled_1_3
 import influxdb_structure
+import neopixel
 
 gc.enable()
 class Wlan():
@@ -18,6 +19,7 @@ class Wlan():
         pass
     def start_wlan(self, credentials = 'default'):
         wdt.feed()
+        board.set_led(value=True, colour = BLUE)
         log.log('ETHZ 2023')
         log.log('pico_nano_monitor')
         log.log(' -> ', board.get_board_name())
@@ -54,6 +56,7 @@ class Wlan():
                 log.log(ifconfig[0])
                 connected = True
                 break
+        board.set_led(value=False)
         if False:
             result = urequests.get('https://ethz.ch/de.html') #'https://www.google.com'
             print('Good result ist 200 and I got: %s' % result.status_code)
@@ -62,7 +65,7 @@ class Wlan():
             print(result.text)
         if not connected:   
             log.log("Could not establish a wlan connection")
-            reset_after_delay()
+            reset_after_delay(error = True)
 
 wlan=Wlan()
 
@@ -135,7 +138,7 @@ class Ota_git:
             reset_after_delay()
         if len(payload.text) == 0: # seams to be wrong
             log.log(f'_get_remote_file len of payload.text was 0, _url: {_url}', level = FATAL)
-            reset_after_delay()
+            reset_after_delay(error = True)
         return payload.text
 
     def _get_local_file(self, file = ''):
@@ -152,17 +155,18 @@ class Ota_git:
         return text
     
     def update_file_if_changed(self, url = '', file='', remote_folder = ''):
-        str_local = self._get_local_file(file = file)
         str_git = self._get_remote_file(url = url, remote_folder = remote_folder, file = file)
+        gc.collect()
+        str_local = self._get_local_file(file = file)
         if str_local != str_git:
                 wdt.feed()
                 f = open(file, "w")
                 f.write(str_git)
                 f.close
-                log.log(f'new:{file}', level= TRACE)
+                log.log(f'new:{file}', level= INFO)
                 return 1
         else:
-                log.log(f'ok :{file}', level= TRACE)
+                log.log(f'ok :{file}', level= INFO)
                 return 0
             
     def _compare_strings(self, str_local, str_git): # in case we search for strange effects
@@ -215,12 +219,23 @@ class FileUpdater:
 
 file_updater = FileUpdater()
 
-def reset_after_delay():
-    for counter in range(5, 0, -1):
+def reset_after_delay(error = False): # In case of an error the LED will be red. A regular reset will not be red.
+    delay = 5
+    if error:
+        board.set_led(value = True, colour = RED)
+        delay = 10
+    for counter in range(delay, 0, -1):
         log.log("reboot in %d s" % counter)
         wdt.feed()
         time.sleep_ms(1000)
+        board.set_led(value = False)
     machine.reset()
+
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+DARK = (0,0,0)
 
 class Board:
     def __init__(self):
@@ -235,6 +250,7 @@ class Board:
             assert False, msg
         print('machine.unique_id(): %s found \'%s\''  % ( unique_id_hex, self.get_board_name()))
         self._led = machine.Pin('LED', machine.Pin.OUT)
+        self._np = neopixel.NeoPixel(machine.Pin('GPIO0'), 1)
         try: # test if main.py is on local file system. If so: real system (no development)
             self._main_is_local = True
             f = open('main.py', "r") 
@@ -247,12 +263,16 @@ class Board:
         return self._boardDict.get('name')
     def get_board_dict(self):
         return self._boardDict
-    def set_led(self, value = True):
+    def set_led(self, value = True, colour = GREEN):
         self._led.value(value)
-    def led_blink_once(self, time_ms = 50):
+        if value: self._np[0] = colour; self._np.write()
+        else: value: self._np[0] = DARK; self._np.write()
+    def led_blink_once(self, time_ms = 50, colour = GREEN):
         self.set_led(value = 1)
+        self._np[0] = colour; self._np.write()
         time.sleep_ms(time_ms)
         self.set_led(value = 0)
+        self._np[0] = DARK; self._np.write()
     def main_is_local(self):
         return self._main_is_local
 
@@ -418,7 +438,7 @@ class Measurements:
             except Exception as err:
                 log.log(Exception, err)
                 log.log('Could not upload')
-                reset_after_delay()
+                reset_after_delay(error = True)
         self.measurements = []
 
 mmts = Measurements()

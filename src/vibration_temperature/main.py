@@ -71,7 +71,7 @@ if pico_tags.get('vibration'):
     tim1.init(period=1, mode=tim1.PERIODIC, callback=vibration.process_isr)
 
 class DS18b20Tags:
-    def __init__(self, id_tags, pin=1):
+    def __init__(self, id_tags, pin='GPIO1'):
         self._id_tags = id_tags
         self._ds = ds = DS18X20(OneWire(machine.Pin(pin))) # pin corresponds to GPx
         self.sensors = ds.scan()
@@ -99,7 +99,7 @@ class DS18b20Tags:
 
 DS18B20_id_tags = pico_tags.get('DS18B20_id_tags')
 
-dst = DS18b20Tags(id_tags=DS18B20_id_tags, pin=1)
+dst = DS18b20Tags(id_tags=DS18B20_id_tags, pin='GPIO1')
 
 
 while True:

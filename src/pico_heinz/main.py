@@ -7,7 +7,7 @@ import machine
 import utils
 import random
 
-utils.wdt.enable()
+#utils.wdt.enable()
 utils.log.enable_oled() # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
@@ -19,7 +19,7 @@ from onewire import OneWire
 from ds18x20 import DS18X20
 
 class DS18b20Tags:
-    def __init__(self, id_tags, pin=1):
+    def __init__(self, id_tags, pin='GPIO1'):
         self._id_tags = id_tags
         self._ds = ds = DS18X20(OneWire(machine.Pin(pin))) # pin corresponds to GPx
         self.sensors = ds.scan()
@@ -47,7 +47,7 @@ class DS18b20Tags:
 DS18B20_id_tags = {
     '28D789660E00000A': {'position': 'auf_tisch', 'setup':'charlie'},
     }
-dst = DS18b20Tags(id_tags=DS18B20_id_tags, pin=1)
+dst = DS18b20Tags(id_tags=DS18B20_id_tags, pin='GPIO1')
 
 class Adc_5V_GP0:
     def __init__(self):
