@@ -11,5 +11,17 @@ pico_tags ={
     'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {},
     'vibration': False},
+    'pico_hanna': {
+    'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {},
+    'vibration': False},
+    'pico_zoe': {
+    'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {},
+    'vibration': False},
+    'pico_anke': {
+    'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {},
+    'vibration': False},
 }
 

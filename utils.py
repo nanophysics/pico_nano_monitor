@@ -244,11 +244,11 @@ class Board:
         unique_id_hex = ubinascii.hexlify(machine.unique_id())
         self._boardDict = uniq_id_names.names_id_dict.get(unique_id_hex)
         if self.get_board_dict() == None:
-            print(f'did not find boardName: No value for key \'{unique_id_hex:s}\'')
-            msg = f'-> add unique_id \'{unique_id_hex:s}\' to uniq_id_names.py'
+            print(f'did not find boardName: No value for key b\'{unique_id_hex:s}\'')
+            msg = f'-> add unique_id b\'{unique_id_hex:s}\' to uniq_id_names.py'
             print(msg)
             assert False, msg
-        print('machine.unique_id(): %s found \'%s\''  % ( unique_id_hex, self.get_board_name()))
+        print('machine.unique_id(): %s found b\'%s\''  % ( unique_id_hex, self.get_board_name()))
         self._led = machine.Pin('LED', machine.Pin.OUT)
         self._np = neopixel.NeoPixel(machine.Pin('GPIO0'), 1)
         try: # test if main.py is on local file system. If so: real system (no development)
