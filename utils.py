@@ -204,7 +204,7 @@ class FileUpdater:
     def update_if_local(self):
         gc.collect()
         if board.main_is_local():
-            log.log('new files?', level = TRACE)
+            log.log('new files?', level = INFO)
             files=['utils.py','uniq_id_names.py','oled_1_3.py']
             updates = 0
             for file in files:
@@ -223,7 +223,7 @@ def reset_after_delay(error = False): # In case of an error the LED will be red.
     delay = 5
     if error:
         board.set_led(value = True, colour = RED)
-        delay = 10
+        delay = 30
     for counter in range(delay, 0, -1):
         log.log("reboot in %d s" % counter)
         wdt.feed()
