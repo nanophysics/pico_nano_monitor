@@ -41,7 +41,7 @@ class Vibration:
         self._vib_sig = machine.ADC(26)
         self._vib_ref = machine.ADC(27)
         self._doReset = False
-        self._listlength = 11 # odd number
+        self._listlength = 5 # odd number
         self._sig_liste = [None]*self._listlength
         self._temp = 0
         
