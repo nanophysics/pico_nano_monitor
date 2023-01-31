@@ -1,23 +1,17 @@
 import machine
 import time
 
-class Adc_5V_GP0:
-    def __init__(self):
-        self.adc = machine.ADC(machine.Pin(26)) # Number corresponds to GPx
+class Adc:
+    def __init__(self, pin = 'GPIO26'):
+        self.adc = machine.ADC(machine.Pin(pin))
         
-    def voltage(self, average_n = 1):
+    def measure(self, average_n = 1) -> float: # 0...1
         # a single measurement takes about 2 us
         # @ average = 1000 it takes about 14ms (measured)
-        uref_V = 3.0 # when using an external LT4040 3V reference
-        R31 = 3900.0
-        R32 = 22000.0
-        R3p = 1.0 / (1.0/R31 + 1.0/R32)
-        R5 = 2200.0
-        fs_V = (R5 + R3p ) / R3p * uref_V
         value_n = 0
         for i in range(average_n):
             value_n += self.adc.read_u16()
-        return(float(value_n) / average_n / 2**16 * fs_V)
+        return(float(value_n) / average_n / 2**16)
 
 class Pressure_15_psi_sensor_ali():
     def __init__(self):
