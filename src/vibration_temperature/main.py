@@ -145,6 +145,6 @@ while True:
     #print(utils.mmts.measurements)
     utils.mmts.upload_to_influx(credentials = 'peter_influx_com') # 'peter_influx_com'   'nano_monitor'
     
-    while utils.time_manager.need_to_wait(update_period_ms = 1 * minute_ms):
+    while utils.time_manager.need_to_wait(update_period_ms = 10 * minute_ms):
         pass
 
