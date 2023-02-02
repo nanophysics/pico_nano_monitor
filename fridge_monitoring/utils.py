@@ -127,7 +127,7 @@ class BlueforsFridge(Fridge):
 
         tags["room"] = self.room
         tags["user"] = self.user
-        tags["setup"] = self.logging_device
+        tags["setup"] = self.setup
         tags["quality"] = "testDeleteLater"
         tags["position"] = position
 
