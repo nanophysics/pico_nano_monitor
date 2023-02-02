@@ -69,7 +69,7 @@ class BlueforsFridge(Fridge):
 
     @classmethod
     def _ommitMeasurement(self):
-        return {"resistance_Ohm", "binary_state"}
+        return {"resistance_Ohm"}
 
     def _package_heaters(self, key, value, filename):
         split = value.split(",")
@@ -86,6 +86,13 @@ class BlueforsFridge(Fridge):
                 key, line[3], self._pressure_assignement[line[0]]
             )
         return
+
+    def _package_binary(self,  key,value):
+        value = value[2:]
+        value = value.split(",")
+        for line in value:
+            self._create_single_measurement(key,line[1],line[0])
+       
 
     def _package_temperatures_resistances(self, key, value, filename):
         # find out witch measurement
@@ -116,7 +123,10 @@ class BlueforsFridge(Fridge):
 
         if key == "flow_mol_per_s":
             self._package_flow(key, value)
+        if key == "binary_state": 
+            self._package_binary(key,value)
         return
+
 
     def _create_single_measurement(self, key, value, position):
         m = dict()
