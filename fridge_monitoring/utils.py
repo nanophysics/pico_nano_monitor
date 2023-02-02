@@ -7,7 +7,8 @@ from influxdb_fridges import InfluxDB
 
 @dataclass(frozen=True)
 class Fridge:
-    setup_name: str
+    logging_device: str
+    setup: str
     room: str
     user: str
     log_folder: str
@@ -23,8 +24,8 @@ class Fridge:
 
 
 class BlueforsFridge(Fridge):
-    def __init__(self, setup_name, room, user, log_folder, manufacturer):
-        super().__init__(setup_name, room, user, log_folder, manufacturer)
+    def __init__(self, logging_device, setup, room, user, log_folder, manufacturer):
+        super().__init__(logging_device, setup, room, user, log_folder, manufacturer)
         self._regex_dict = {
             "temperature_K": r"CH[0-9] T",
             "resistance_Ohm": r"CH[0-9] R",
@@ -74,17 +75,15 @@ class BlueforsFridge(Fridge):
         split = value.split(",")
         split = np.reshape(split, (2, 2))
         for i, line in enumerate(split):
-            value = float(line[1]) * self._SI_unitconverter[key]
-            self._create_single_measurement(key, value, self._heater_assignement[i])
+            self._create_single_measurement(key, line[1], self._heater_assignement[i])
         return
 
     def _package_pressures(self, key, value, filename):
         split = value.split(",")[:-1]
         split = np.reshape(split, (6, 6))
         for line in split:
-            value = float(line[3]) * self._SI_unitconverter[key]
             self._create_single_measurement(
-                key, value, self._pressure_assignement[line[0]]
+                key, line[3], self._pressure_assignement[line[0]]
             )
         return
 
@@ -92,11 +91,10 @@ class BlueforsFridge(Fridge):
         # find out witch measurement
         mtch = re.match(self._regex_dict[key], filename)
         position = self._temperature_assignement[mtch.group(0)[:3]]
-        value = float(value) * self._SI_unitconverter[key]
+
         self._create_single_measurement(key, value, position)
 
     def _package_flow(self, key, value):
-        value = float(value) * self._SI_unitconverter[key]
         position = "flow_after_coldtrap"
         self._create_single_measurement(key, value, position)
 
@@ -106,17 +104,17 @@ class BlueforsFridge(Fridge):
             print("We dont store that value")
             return
 
-        if key is "temperature_K":
+        if key == "temperature_K":
             print("We do a temperature measurement ")
             self._package_temperatures_resistances(key, value, filename)
 
-        if key is "power_W":
+        if key == "power_W":
             self._package_heaters(key, value, filename)
 
-        if key is "pressure_Pa_abs":
+        if key == "pressure_Pa_abs":
             self._package_pressures(key, value, filename)
 
-        if key is "flow_mol_per_s":
+        if key == "flow_mol_per_s":
             self._package_flow(key, value)
         return
 
@@ -125,14 +123,18 @@ class BlueforsFridge(Fridge):
         tags = dict()
         fields = dict()
 
-        m["measurement"] = self.setup_name
+        m["measurement"] = self.logging_device
 
         tags["room"] = self.room
         tags["user"] = self.user
-        tags["quality"] = "testDeletLater"
+        tags["setup"] = self.logging_device
+        tags["quality"] = "testDeleteLater"
         tags["position"] = position
 
-        fields[key] = value * self._SI_unitconverter[key]
+        if key == "binary_state":
+            fields[key] = bool(int(value) * self._SI_unitconverter[key])
+        else:
+            fields[key] = float(value) * self._SI_unitconverter[key]
 
         m["tags"] = tags
         m["fields"] = fields
@@ -177,6 +179,7 @@ class Measurements:
             "uptime_s": None,
             "binary_state": None,  # True False
             "humidity_pRH": None,
+            "power_W": None,
         }
 
         self._influxTagKeyDict = {
@@ -205,18 +208,22 @@ class Measurements:
         return
 
     def _assert_valid(self, measurement):
-        for field_name in measurement['fields']:
-            assert field_name in self._influxFieldKeyDict, f"field '{field_name}' is not in {self._influxFieldKeyDict}"
-        for tag_name, tag_value in measurement['tags'].items():
+        for field_name in measurement["fields"]:
+            assert (
+                field_name in self._influxFieldKeyDict
+            ), f"field '{field_name}' is not in {self._influxFieldKeyDict}"
+        for tag_name, tag_value in measurement["tags"].items():
             valid_values = self._influxTagKeyDict[tag_name]
             if valid_values is None:
                 continue
-            assert tag_value in valid_values, f"{tag_name}={tag_value} is not in {valid_values}"
+            assert (
+                tag_value in valid_values
+            ), f"{tag_name}={tag_value} is not in {valid_values}"
 
 
 if __name__ == "__main__":
     f = BlueforsFridge(
-        setup_name="Zorro",
+        logging_device="Zorro",
         room="heaven",
         user="benekrat",
         log_folder="test",
