@@ -90,6 +90,7 @@ class BlueforsFridge(Fridge):
     def _package_binary(self,  key,value):
         value = value[2:]
         value = value.split(",")
+        value = np.reshape(value, (32, 2))
         for line in value:
             self._create_single_measurement(key,line[1],line[0])
        
