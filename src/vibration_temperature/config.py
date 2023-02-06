@@ -23,5 +23,9 @@ pico_tags ={
     'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {},
     'vibration': False},
+    'pico_hugo': {
+    'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {'28BF0FA40E000001': {'position': 'unter_tisch', 'setup':'emma'}},
+    'vibration': False},
 }
 
