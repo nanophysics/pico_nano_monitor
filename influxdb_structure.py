@@ -51,6 +51,7 @@ measurementExample = [
             "humidity_pRH": "88.2",
         },
         "tags": {
+            "setup": "zeus",
             "room": "B15",
             "position": "hintenLinks",
             "user": "pmaerki",
