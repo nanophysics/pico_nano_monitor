@@ -1,6 +1,6 @@
-#https://docs.influxdata.com/influxdb/cloud/reference/key-concepts/data-elements/
+# https://docs.influxdata.com/influxdb/cloud/reference/key-concepts/data-elements/
 
-influxFieldKeyDict= { # Zahlenwerte
+influxFieldKeyDict = {  # Zahlenwerte
     "temperature_C": None,
     "temperature_K": None,
     "pressure_Pa_rel": None,
@@ -11,42 +11,71 @@ influxFieldKeyDict= { # Zahlenwerte
     "powerOutage_s": None,
     "power_W": None,
     "uptime_s": None,
-    "binary_state": None, # True False
-    "vibration_peak_AU": None, # Integer
-    "vibration_average_AU": None, # Integer
-    "humidity_pRH": None,}
+    "binary_state": None,  # True False
+    "vibration_peak_AU": None,  # Integer
+    "vibration_average_AU": None,  # Integer
+    "humidity_pRH": None,
+}
 
-influxTagKeyDict= {
-    "room": ["B15","B16","B17", "C17"],
-    "setup": ['sofia', 'tabea', 'fritz', 'charlie', 'broker'],
-    "position": None, # z.B. "N2 exhaust tube" 
+influxTagKeyDict = {
+    "room": ["A", "C15", "C17", "C18", "B15", "B16", "B17", "D24", "E9"],
+    "setup": [
+        "bigmom",
+        "zeus",
+        "titan",
+        "tarzan",
+        "emma",
+        "bertram",
+        "nele",
+        "dobby",
+        "bud",
+        "charly",
+        "anna",
+        "werner",
+        "sofia",
+        "tabea",
+        "fritz",
+        "charlie",
+        "broker",
+    ],
+    "position": None,  # z.B. "N2 exhaust tube"
     "user": ["pmaerki", "benekrat", "baehler", "lostertag"],
-    "quality": ["testDeleteLater", "use"],}
+    "quality": ["testDeleteLater", "use"],
+}
 
-measurementExample = [{
-    'measurement': 'pico_emil', # a measurement has one 'measurement'. It is the name of the pcb.
-    'fields': {
-        'temperature_C': '23.5',
-        'humidity_pRH': '88.2',},
-    'tags': {
-        'room': 'B15',
-        "position": "hintenLinks",
-        'user': 'pmaerki',},
-    },]
-        
+measurementExample = [
+    {
+        "measurement": "pico_emil",  # a measurement has one 'measurement'. It is the name of the pcb.
+        "fields": {
+            "temperature_C": "23.5",
+            "humidity_pRH": "88.2",
+        },
+        "tags": {
+            "room": "B15",
+            "position": "hintenLinks",
+            "user": "pmaerki",
+        },
+    },
+]
+
+
 def assert_valid(measurements):
     for measurement in measurements:
-        for field_name in measurement['fields']:
-            assert field_name in influxFieldKeyDict, f"field '{field_name}' is not in {influxFieldKeyDict}"
-        for tag_name, tag_value in measurement['tags'].items():
+        for field_name in measurement["fields"]:
+            assert (
+                field_name in influxFieldKeyDict
+            ), f"field '{field_name}' is not in {influxFieldKeyDict}"
+        for tag_name, tag_value in measurement["tags"].items():
             valid_values = influxTagKeyDict[tag_name]
             if valid_values is None:
                 continue
-            assert tag_value in valid_values, f"{tag_name}={tag_value} is not in {valid_values}"
+            assert (
+                tag_value in valid_values
+            ), f"{tag_name}={tag_value} is not in {valid_values}"
 
 
 assert_valid(measurementExample)
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     print(measurementExample)
