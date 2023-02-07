@@ -172,7 +172,7 @@ while True:
     measurement_counter += 1
     # print(utils.mmts.measurements)
     utils.mmts.upload_to_influx(
-        credentials="peter_influx_com"
+        credentials='nano_monitor'
     )  # 'peter_influx_com'   'nano_monitor'
 
     while utils.time_manager.need_to_wait(update_period_ms=10 * minute_ms):
