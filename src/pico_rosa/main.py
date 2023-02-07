@@ -7,11 +7,18 @@ import time
 import machine
 import utils
 import random
+import micropython
 
-utils.wdt.enable()
+micropython.alloc_emergency_exception_buf(100)
+
+#utils.wdt.enable()
 utils.log.enable_oled()  # comment out if there is no oled
-utils.wlan.start_wlan()
-utils.file_updater.update_if_local()
+
+upload_to_influx = True # if False just print, fast and reliable
+
+if upload_to_influx:
+    utils.wlan.start_wlan()
+    utils.file_updater.update_if_local()
 
 minute_ms = 60 * 1000
 hour_ms = 60 * minute_ms
@@ -19,122 +26,184 @@ utils.time_manager.set_period_restart_ms(
     time_restart_ms=6 * hour_ms + random.randrange(10 * minute_ms)
 )  # will reset after this time
 
-from onewire import OneWire
-from ds18x20 import DS18X20
+
+adc26 = machine.ADC(machine.Pin(26))
 
 
-class DS18b20Tags:
-    def __init__(self, id_tags, pin="GPIO1"):
-        self._id_tags = id_tags
-        self._ds = ds = DS18X20(OneWire(machine.Pin(pin)))  # pin corresponds to GPx
-        self.sensors = ds.scan()
-        self._ds.convert_temp()  # after power on reset the value is wrong. Therefore measure here once.
-        time.sleep_ms(900)  # mandatory pause to collect results, datasheet max 750 ms
-        for s in self.sensors:
-            utils.log.log(
-                "DS18b20 scanned sensor: '" + "".join("%02X" % i for i in iter(s)) + "'"
-            )
 
-    def tags(self, sensor):
-        return self._id_tags.get("".join("%02X" % i for i in iter(sensor)))
+class outage:
+    def __init__(self, outage_ms = 0, outage_ongoing = False):
+        self.outage_ms = outage_ms
+        self.outage_ongoing = outage_ongoing
+        self.uploaded = False
 
-    def do_measure(self):
-        self._ds.convert_temp()
-        time.sleep_ms(
-            750 + 150
-        )  # mandatory pause to collect results, datasheet max 750 ms
+    def worse(self, outage): # return true if worse
+        worse = False
+        if outage.outage_ms > self.outage_ms:
+            worse = True
+            return(worse)
+        if outage.outage_ms == self.outage_ms:
+            if outage.outage_ongoing == False and self.outage_ongoing == True: # outage ended
+                worse = True
+        return(worse)
 
-    def measure_influx(self, sensor):
-        """
-        Returns temperature as string ready to send to influxdb
-        """
-        temperatureC = self._ds.read_temp(sensor)
-        utils.log.log("%0.2f C" % temperatureC)
-        return "%0.2f" % temperatureC
+    def update_if_worse(self, outage):
+        if self.worse(outage):
+            self.outage_ms = outage.outage_ms
+            self.outage_ongoing = outage.outage_ongoing
 
+    def need_to_report(self):
+        need_report =  self.outage_ms > 30
+        return(need_report)
 
-DS18B20_id_tags = {
-    "28D789660E00000A": {"position": "auf_tisch", "setup": "charlie"},
-}
-dst = DS18b20Tags(id_tags=DS18B20_id_tags, pin="GPIO1")
+    def print(self):
+        print('outage_ms: %d, outage_ongoing: %s' % (self.outage_ms, self.outage_ongoing))
+        
+        need_report =  self.outage_ms > 30
+        return(need_report)
 
+    def reset(self): # return true if worse
+        self.outage_ms = 0
+        self.outage_ongoing = False
+        self.uploaded = False
 
-class Adc_5V_GP0:
+class Ssr_relais():
     def __init__(self):
-        self.adc = machine.ADC(machine.Pin(26))  # Number corresponds to GPx
+        self._relais1 = machine.Pin(3, machine.Pin.OUT) #number is GPx
+        self.on()
+    
+    def on(self):
+        self._relais1.on()
 
-    def voltage(self, average_n=1):
-        # a single measurement takes about 2 us
-        # @ average = 1000 it takes about 14ms (measured)
-        uref_V = 3.0  # when using an external LT4040 3V reference
-        R31 = 3900.0
-        R32 = 22000.0
-        R3p = 1.0 / (1.0 / R31 + 1.0 / R32)
-        R5 = 2200.0
-        fs_V = (R5 + R3p) / R3p * uref_V
-        value_n = 0
-        for i in range(average_n):
-            value_n += self.adc.read_u16()
-        return float(value_n) / average_n / 2 ** 16 * fs_V
+    def off(self):
+        self._relais1.off()
+        
+relais = Ssr_relais()
 
+def isr_loop(k):
+    global outage_actual, outage_report, outage_upload
+    meassurement_u16 = adc26.read_u16()
+    if meassurement_u16 < 40000:
+        outage_actual.outage_ongoing = True
+        outage_actual.outage_ms += 1
+        outage_report.update_if_worse(outage_actual)
+    else:
+        outage_actual.outage_ongoing = False
+        outage_report.update_if_worse(outage_actual)
+        outage_actual.reset()
+    if outage_upload.uploaded: # upload was successfull
+        if outage_upload.worse(outage_report): # in between the report got worse, do upload again
+            return
+        if outage_upload.outage_ongoing == True: # still ongoing
+            return
+        outage_report.reset()
+        outage_upload.reset()
 
-class Pressure_15_psi_sensor_ali:
-    def __init__(self):
-        self.adc_5V_GP0 = Adc_5V_GP0()
-        self.overload = True
-
-    def get_pressure_pa(self, average_n=1000):
-        voltage_V = self.adc_5V_GP0.voltage(average_n=average_n)
-        # Drucksensor absolut von Alie XIDIBEI Official Store 15 psi
-        pa_per_psi = (
-            6894.75729  # https://www.unitconverters.net/pressure/psi-to-pascal.htm
-        )
-        p1_pa = 0.0
-        p2_pa = 15.0 * pa_per_psi
-        u1_V = 0.5
-        u2_V = 4.5
-        self.overload = voltage_V < u1_V or voltage_V > u2_V
-        pressure_Pa_rel = (p2_pa - p1_pa) / (u2_V - u1_V) * (voltage_V - u1_V)
-        utils.log.log("%d Pa" % pressure_Pa_rel)
-        return pressure_Pa_rel
-
-    def get_overload(self):
-        return self.overload
-
-
-pressure_15_psi_sensor_ali = Pressure_15_psi_sensor_ali()
-
-while True:
-    utils.board.set_led(value=1)
-    dst.do_measure()
-    dict_tag = {
-        "room": "B15",
-        "setup": "charlie",
-        "user": "pmaerki",
-        "quality": "testDeleteLater",
-    }
-    for sensor in dst.sensors:
-        DS_dict = dst.tags(sensor)
-        DS_dict.update(dict_tag)
-        utils.mmts.append(
-            {"tags": dict_tag, "fields": {"temperature_C": dst.measure_influx(sensor)}}
-        )
-    utils.mmts.append(
-        {
-            "tags": dict_tag,
-            "fields": {
-                "pressure_Pa_rel": "%0.2f"
-                % pressure_15_psi_sensor_ali.get_pressure_pa(average_n=1000)
-            },
+def upload():
+    global last_upload_ms, outage_actual, outage_report, outage_upload, start_up_ms
+    #print(f'upload to influx, time since start up {time.ticks_diff(time.ticks_ms(),start_up_ms):d}')
+    outage_upload.update_if_worse(outage_report)
+    utils.log.log(f"Outage {outage_upload.outage_ms:d} ms")
+    if upload_to_influx:
+        dict_tag = {
+            "room": "E9",
+            "user": "pmaerki",
+            "quality": "testDeleteLater",
         }
-    )
-    utils.mmts.append(
-        {"tags": dict_tag, "fields": {"uptime_s": "%d" % utils.time_manager.uptime_s()}}
-    )
+        utils.mmts.append(
+            {
+                "tags": dict_tag,
+                "fields": {
+                    "powerOutage_s": "%0.3f"
+                    % (float(outage_upload.outage_ms)/1000.0)
+                },
+            }
+        )
+        utils.mmts.append(
+            {"tags": dict_tag, "fields": {"uptime_s": "%d" % utils.time_manager.uptime_s()}}
+        )
 
-    utils.mmts.upload_to_influx(
-        credentials="peter_influx_com"
-    )  # 'peter_influx_com' ,  'nano_monitor'
+        utils.mmts.upload_to_influx(
+            credentials='nano_monitor'
+        )  # 'peter_influx_com' ,  'nano_monitor'
+        outage_upload.uploaded = True # atomic
+        last_upload_ms = time.ticks_ms()
+    else: # just print
+        if True: #if upload_success: # if upload success
+            print('uploaded success: ', end='')
+            outage_upload.print()
+            outage_upload.uploaded = True # atomic
+            last_upload_ms = time.ticks_ms()
+        else:
+            outage_upload.reset() # was not successful, do upload later again
 
-    while utils.time_manager.need_to_wait(update_period_ms=10 * minute_ms):
-        pass
+last_upload_ms = time.ticks_diff(time.ticks_ms(), 20000)
+start_up_ms = time.ticks_ms()
+
+MIN_MS = 60 * 1000
+periodic_upload_without_outage_min = 10
+# report periodic loop
+def periodic_upload_loop(upload_success = True):
+    global last_upload_ms, outage_actual, outage_report, outage_upload, start_up_ms
+    #print('periodic_upload_loop')
+    if not outage_report.need_to_report():
+        if time.ticks_diff(time.ticks_ms(), last_upload_ms) > periodic_upload_without_outage_min * MIN_MS:
+            print('Periodic upload even without an outage')
+            upload()
+        return
+    if outage_report.outage_ongoing and outage_report.outage_ms < 2000: # outage is ongoing, do not upload before 2s
+        return
+    if time.ticks_diff(time.ticks_ms(), last_upload_ms) < 2000: #or outage_upload.outage_ongoing == False: # do not upload more often than every 10 seconds if outage ongoing
+        return
+    upload()
+    
+outage_actual = outage()
+outage_report = outage()
+outage_upload = outage()
+
+ticks_start_ms = time.ticks_ms()
+
+tim1 = machine.Timer(-1)
+tim2 = machine.Timer(-1)
+tim1.init(period=1, mode=tim1.PERIODIC, callback = isr_loop)
+tim2.init(period=10, mode=tim1.PERIODIC, callback = periodic_upload_loop)#period in ms
+
+
+if upload_to_influx:
+    while True: # this loop ist just for fun and to be compatible with others
+        time.sleep_ms(10)
+        utils.time_manager.need_to_wait(update_period_ms=10 * minute_ms)
+        #while utils.time_manager.need_to_wait(update_period_ms=10 * minute_ms):
+        #    pass
+        print(f'outage_report.outage_ms {outage_report.outage_ms:d} ms')
+
+
+def generiere_outage(outage_ms=50):
+    global relais
+    print(f'Es folgt ein outage von ca. {outage_ms:d}ms')
+    relais.off()
+    time.sleep_ms(outage_ms)
+    relais.on()
+    
+def generiere_pause(pause_ms=1000):
+    global relais
+    print(f'Es folgt eine Pause von {pause_ms:d}ms')
+    time.sleep_ms(pause_ms)
+    
+while False:
+    time.sleep_ms(1000)
+    print(f'report {outage_report.outage_ms:d} on:{outage_report.outage_ongoing:d} upload  {outage_upload.outage_ms:d} on:{outage_upload.outage_ongoing:d}')
+
+if True:
+    time.sleep_ms(1000)
+    generiere_outage(outage_ms=100)
+    generiere_pause(pause_ms=1000)
+    generiere_outage(outage_ms=1000)
+    generiere_pause(pause_ms=5000)
+    generiere_outage(outage_ms=2500)
+    generiere_pause(pause_ms=5000)
+    generiere_outage(outage_ms=35)
+    generiere_pause(pause_ms=5000)
+    
+while True:
+    time.sleep_ms(1000)
