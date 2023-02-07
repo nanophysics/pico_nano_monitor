@@ -337,15 +337,26 @@ class Wdt:
     def __init__(self):
         self._wdt = None
         self._monitor_last_wdt_ms = time.ticks_ms()
-        self._timeout = 8300
+        self._timeout = 8388
+        self._installed = False
 
     def enable(self):
         if board.main_is_local:
             self._wdt = machine.WDT(
                 timeout=self._timeout
             )  # The maximum value for timeout is 8388 ms.
+            self._installed = True
             log.log(f"Wdt is enabled; timeout = {self._timeout:d} ms", level=TRACE)
             self._monitor_last_wdt_ms = time.ticks_ms()
+
+    def halt_temporary(self, value = False): # https://github.com/micropython/micropython/issues/8600
+        if self._installed:
+            if value:
+                machine.mem32[0x40058000] = machine.mem32[0x40058000] & ~(1<<30)
+                log.log(f"Wdt is halted temporary", level=TRACE)
+            else:
+                self.enable()
+        
 
     def feed(self):
         if self._wdt:
@@ -517,9 +528,11 @@ class Measurements:
                     )
                     # print(url + f'/write?db={db_name}')#, data = payload, auth=auth)
                     # print(auth)
+                    wdt.halt_temporary(value=True) # very ugly, but the urequests takes very long
                     result = urequests.post(
                         url + f"/write?db={db_name}", data=payload, auth=auth
                     )
+                    wdt.halt_temporary(value=False)
                 if secrets.influx_credentials[credentials].get(
                     "influxdb_token"
                 ):  # authentication new influxdb.com
