@@ -1,6 +1,6 @@
 """
 for debuging: delete file main.py on RP2. Execute main.py with Thonny from PC
-for final use: put main.py on RP2
+for final use: put main.py on RP2 
 """
 
 import time
@@ -141,7 +141,7 @@ last_upload_ms = time.ticks_diff(time.ticks_ms(), 20000)
 start_up_ms = time.ticks_ms()
 
 MIN_MS = 60 * 1000
-periodic_upload_without_outage_min = 10
+periodic_upload_without_outage_min = 1
 # report periodic loop
 def periodic_upload_loop(upload_success = True):
     global last_upload_ms, outage_actual, outage_report, outage_upload, start_up_ms
