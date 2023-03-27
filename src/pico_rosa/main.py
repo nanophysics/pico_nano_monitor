@@ -14,7 +14,7 @@ micropython.alloc_emergency_exception_buf(100)
 #utils.wdt.enable()
 utils.log.enable_oled()  # comment out if there is no oled
 
-upload_to_influx = True # if False just print, fast and reliable
+upload_to_influx = False # if False just print, fast and reliable
 
 if upload_to_influx:
     utils.wlan.start_wlan()
@@ -36,6 +36,12 @@ class outage:
         self.outage_ms = outage_ms
         self.outage_ongoing = outage_ongoing
         self.uploaded = False
+        self.trace_array_len = 500
+        self.trace_array = [0] * self.trace_array_len
+        self.trace_n = 0
+        #self.trace_array_snapshot = [0] * self.trace_array_len
+        self.do_record_array = True
+        self.counter_temp_n = 0
 
     def worse(self, outage): # return true if worse
         worse = False
@@ -51,6 +57,8 @@ class outage:
         if self.worse(outage):
             self.outage_ms = outage.outage_ms
             self.outage_ongoing = outage.outage_ongoing
+            #self.trace_array = [x for x in outage.trace_array]
+            #self.trace_n = outage.trace_n
 
     def need_to_report(self):
         need_report =  self.outage_ms > 30
@@ -62,10 +70,14 @@ class outage:
         need_report =  self.outage_ms > 30
         return(need_report)
 
-    def reset(self): # return true if worse
+    def reset(self):
         self.outage_ms = 0
         self.outage_ongoing = False
         self.uploaded = False
+'''
+    def take_array_snapshot(self):
+        self.trace_array_snapshot = [x for x in self.trace_array]
+'''
 
 class Ssr_relais():
     def __init__(self):
@@ -81,9 +93,15 @@ class Ssr_relais():
 relais = Ssr_relais()
 
 def isr_loop(k):
-    global outage_actual, outage_report, outage_upload
-    meassurement_u16 = adc26.read_u16()
-    if meassurement_u16 < 40000:
+    #global outage_actual, outage_report, outage_upload
+    meassurement_u16 = adc26.read_u16()  >> 4 # RP2040 has only 12 bit ad converter. 
+    outage_actual.counter_temp_n += 1
+
+    if outage_actual.do_record_array:
+        outage_actual.trace_n = (outage_actual.trace_n + 1) % outage_actual.trace_array_len
+        outage_actual.trace_array[outage_actual.trace_n] = meassurement_u16
+
+    if meassurement_u16 < 2500:
         outage_actual.outage_ongoing = True
         outage_actual.outage_ms += 1
         outage_report.update_if_worse(outage_actual)
@@ -100,10 +118,34 @@ def isr_loop(k):
         outage_upload.reset()
 
 def upload():
-    global last_upload_ms, outage_actual, outage_report, outage_upload, start_up_ms
+    #global last_upload_ms, outage_actual, outage_report, outage_upload, start_up_ms
     #print(f'upload to influx, time since start up {time.ticks_diff(time.ticks_ms(),start_up_ms):d}')
     outage_upload.update_if_worse(outage_report)
-    utils.log.log(f"Outage {outage_upload.outage_ms:d} ms")
+    #utils.log.log(f"Outage {outage_upload.outage_ms:d} ms")
+
+
+    ticks_A_ms = time.ticks_ms()
+    a_n = outage_actual.counter_temp_n
+    print('a_n', a_n)
+
+    for k in range(50):
+        time.sleep_ms(1) # for the trace, collect more to see recovered mains
+
+    ticks_B_ms = time.ticks_ms()
+    b_n = outage_actual.counter_temp_n
+    print('b_n', b_n)   
+
+    print('vergangen ms', time.ticks_diff(ticks_B_ms, ticks_A_ms), b_n-a_n, a_n)
+
+    outage_actual.do_record_array = False
+    for i in range(outage_actual.trace_array_len):
+        outage_upload.trace_array[i] = outage_actual.trace_array[ (i+outage_actual.trace_n+1) % outage_actual.trace_array_len]
+    for i in range(outage_actual.trace_array_len):
+        outage_actual.trace_array[i] = None
+    outage_actual.do_record_array = True
+
+    print ('trace =', outage_upload.trace_array)
+
     if upload_to_influx:
         dict_tag = {
             "room": "E9",
@@ -145,8 +187,8 @@ MIN_MS = 60 * 1000
 periodic_upload_without_outage_min = 10
 
 # report periodic loop
-def periodic_upload_loop(upload_success = True):
-    global last_upload_ms, outage_actual, outage_report, outage_upload, start_up_ms
+def scheduled_periodic_upload_loop(upload_success = True):
+    #global last_upload_ms, outage_actual, outage_report, outage_upload, start_up_ms
     #print('periodic_upload_loop')
     if not outage_report.need_to_report():
         if time.ticks_diff(time.ticks_ms(), last_upload_ms) > periodic_upload_without_outage_min * MIN_MS:
@@ -158,6 +200,9 @@ def periodic_upload_loop(upload_success = True):
     if time.ticks_diff(time.ticks_ms(), last_upload_ms) < 2000: #or outage_upload.outage_ongoing == False: # do not upload more often than every 10 seconds if outage ongoing
         return
     upload()
+
+def isr_periodic_upload_loop(salami):
+    micropython.schedule(scheduled_periodic_upload_loop, 'hugo')
     
 outage_actual = outage()
 outage_report = outage()
@@ -168,7 +213,7 @@ ticks_start_ms = time.ticks_ms()
 tim1 = machine.Timer(-1)
 tim2 = machine.Timer(-1)
 tim1.init(period=1, mode=tim1.PERIODIC, callback = isr_loop)
-tim2.init(period=10, mode=tim1.PERIODIC, callback = periodic_upload_loop)#period in ms
+tim2.init(period=300, mode=tim1.PERIODIC, callback = isr_periodic_upload_loop)#period in ms
 
 
 if upload_to_influx:
@@ -196,7 +241,7 @@ while False:
     time.sleep_ms(1000)
     print(f'report {outage_report.outage_ms:d} on:{outage_report.outage_ongoing:d} upload  {outage_upload.outage_ms:d} on:{outage_upload.outage_ongoing:d}')
 
-if True:
+if False:
     time.sleep_ms(1000)
     generiere_outage(outage_ms=100)
     generiere_pause(pause_ms=1000)
@@ -207,5 +252,10 @@ if True:
     generiere_outage(outage_ms=35)
     generiere_pause(pause_ms=5000)
     
-while True:
-    time.sleep_ms(1000)
+while False:
+    for k in range(1000):
+        time.sleep_ms(1)
+    #time.sleep_ms(1000)
+    print(f'actual {outage_actual.outage_ms} ms, report {outage_report.outage_ms} ms, count {outage_actual.counter_temp_n} ')
+    #outage_actual.take_array_snapshot()
+    #print(outage_actual.trace_array_snapshot)
