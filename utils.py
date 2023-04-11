@@ -381,7 +381,7 @@ class TimeManager:
         self._time_next_update_ms = None
 
     def need_to_wait(
-        self, update_period_ms=5000
+        self, update_period_ms=5000, wait_time_ms = 1000
     ):  # Waits for 1000ms if we need to wait. Returns True if we need to wait.
         if not self._time_next_update_ms:
             self._time_next_update_ms = time.ticks_add(
@@ -404,8 +404,12 @@ class TimeManager:
                     reset_after_delay()
             log.oled_progress_bar(1.0 - time_to_wait_ms / update_period_ms)
             wdt.feed()
-            board.led_blink_once(time_ms=50)
-            time.sleep_ms(1000 - 50)
+            if wait_time_ms >= 50:
+                blink_ms = 50
+                board.led_blink_once(blink_ms)
+                sleep_ms = wait_time_ms - blink_ms
+                if sleep_ms > 0:
+                    time.sleep_ms(sleep_ms)
             wdt.feed()
             return True
         log.log("uptime ", time_manager.uptime_s_str(self.uptime_s()))

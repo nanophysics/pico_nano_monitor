@@ -9,6 +9,7 @@ influxFieldKeyDict = {  # Zahlenwerte
     "flow_m3_per_s": None,
     "flow_mol_per_s": None,
     "powerOutage_s": None,
+    "outage_trace_V": None,
     "power_W": None,
     "uptime_s": None,
     "binary_state": None,  # True False
