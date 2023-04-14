@@ -146,6 +146,7 @@ class Ota_git:
         wdt.feed()
         _url = url + remote_folder + file
         payload = urequests.get(_url, headers=self._headers)
+        gc.collect()
         if payload.status_code != 200:
             log.log(
                 f"_get_remote_file got status_code of {payload.status_code}, _url: {_url}",
