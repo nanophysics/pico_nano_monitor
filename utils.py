@@ -284,11 +284,11 @@ _DARK = micropython.const((0, 0, 0))
 
 class Board:
     def __init__(self):
-        import uniq_id_names
         import ubinascii
-
+        local_ns = {}
+        execfile('uniq_id_names.py', local_ns)
         unique_id_hex = ubinascii.hexlify(machine.unique_id())
-        self._boardDict = uniq_id_names.names_id_dict.get(unique_id_hex)
+        self._boardDict = local_ns.get('names_id_dict').get(unique_id_hex)
         if self.get_board_dict() == None:
             print(f"did not find boardName: No value for key b'{unique_id_hex:s}'")
             msg = f"-> add unique_id b'{unique_id_hex:s}' to uniq_id_names.py"
