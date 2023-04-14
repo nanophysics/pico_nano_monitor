@@ -7,11 +7,12 @@ import secrets
 import time
 import machine
 import urequests
-import uhashlib
+#import uhashlib
 import gc
 import oled_1_3
 import influxdb_structure
 import neopixel
+import micropython
 
 gc.enable()
 
@@ -22,7 +23,7 @@ class Wlan:
 
     def start_wlan(self, credentials="default"):
         wdt.feed()
-        board.set_led(value=True, colour=BLUE)
+        board.set_led(value=True, colour=_BLUE)
         log.log("ETHZ 2023")
         log.log("pico_nano_monitor")
         log.log(" -> ", board.get_board_name())
@@ -30,6 +31,7 @@ class Wlan:
         self.wlan = network.WLAN(network.STA_IF)
         self.wlan.active(True)
         self.wlan.config(pm=0xA11140)  # Diable powersave mode
+        '''
         self.status_dict = {
             "0": "CYW43_LINK_DOWN (0): Es besteht keine WLAN-Verbindung.",
             "1": "CYW43_LINK_JOIN (1): Verbindungsaufbau-Versuch, noch nicht abgeschlossen.",
@@ -39,6 +41,7 @@ class Wlan:
             "-2": "CYW43_LINK_NONET (-2): Verbindungsaufbau abgebrochen, WLAN (SSID) nicht gefunden.",
             "-3": "CYW43_LINK_BADAUTH (-3): Verbindungsaufbau abgebrochen, Authentifizierung fehlgeschlagen. Vemutlich WLAN-Passwort falsch.",
         }
+        '''
         connected = False
         for secret in secrets.wlan_credentials[credentials]:
             status_old = None
@@ -75,12 +78,12 @@ class Wlan:
 
 wlan = Wlan()
 
-TRACE = 0
-DEBUG = 1
-INFO = 2
-WARN = 3
-ERROR = 4
-FATAL = 5
+TRACE = micropython.const(0)
+DEBUG = micropython.const(1)
+INFO = micropython.const(2)
+WARN = micropython.const(3)
+ERROR = micropython.const(4)
+FATAL = micropython.const(5)
 
 
 class Log:
@@ -177,7 +180,10 @@ class Ota_git:
 
     def update_file_if_changed(self, url="", file="", remote_folder=""):
         str_git = self._get_remote_file(url=url, remote_folder=remote_folder, file=file)
+        #log.log(f"file: {file}?", level=INFO)
         gc.collect()
+        #log.log(f"str_git:{str_git}", level=INFO)
+        #gc.collect()
         str_local = self._get_local_file(file=file)
         if str_local != str_git:
             wdt.feed()
@@ -259,7 +265,7 @@ def reset_after_delay(
 ):  # In case of an error the LED will be red. A regular reset will not be red.
     delay = 5
     if error:
-        board.set_led(value=True, colour=RED)
+        board.set_led(value=True, colour=_RED)
         delay = 30
     for counter in range(delay, 0, -1):
         log.log("reboot in %d s" % counter)
@@ -269,11 +275,11 @@ def reset_after_delay(
     machine.reset()
 
 
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-DARK = (0, 0, 0)
+#WHITE = (255, 255, 255)
+_RED = micropython.const((255, 0, 0))
+_GREEN = micropython.const((0, 255, 0))
+_BLUE = micropython.const((0, 0, 255))
+_DARK = micropython.const((0, 0, 0))
 
 
 class Board:
@@ -309,22 +315,22 @@ class Board:
     def get_board_dict(self):
         return self._boardDict
 
-    def set_led(self, value=True, colour=GREEN):
+    def set_led(self, value=True, colour=_GREEN):
         self._led.value(value)
         if value:
             self._np[0] = colour
             self._np.write()
         else:
-            value: self._np[0] = DARK
+            value: self._np[0] = _DARK
             self._np.write()
 
-    def led_blink_once(self, time_ms=50, colour=GREEN):
+    def led_blink_once(self, time_ms=50, colour=_GREEN):
         self.set_led(value=1)
         self._np[0] = colour
         self._np.write()
         time.sleep_ms(time_ms)
         self.set_led(value=0)
-        self._np[0] = DARK
+        self._np[0] = _DARK
         self._np.write()
 
     def main_is_local(self):

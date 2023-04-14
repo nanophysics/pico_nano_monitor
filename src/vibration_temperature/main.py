@@ -5,22 +5,21 @@ for final use: put main.py on RP2
 import time
 import machine
 import utils
-import config
-import random
-
 import micropython
 
 micropython.alloc_emergency_exception_buf(100)
+
+time.sleep_ms(3000) # allows to interrupt with Thonny
 
 utils.wdt.enable()
 utils.log.enable_oled()  # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
 
-minute_ms = 60 * 1000
-hour_ms = 60 * minute_ms
+minute_ms = micropython.const(60 * 1000)
+hour_ms = micropython.const(60 * minute_ms)
 utils.time_manager.set_period_restart_ms(
-    time_restart_ms=24 * hour_ms + random.randrange(10 * minute_ms)
+    time_restart_ms=24 * hour_ms
 )  # will reset after this time
 
 measurement_counter = 0
@@ -29,9 +28,13 @@ from onewire import OneWire
 from ds18x20 import DS18X20
 
 msg = f"config.py has no entry for '{utils.board.get_board_name():s}'. Complement this file."
-pico_tags = config.pico_tags.get(utils.board.get_board_name())
+def read_config(board_name = ''):
+    local_ns = {}
+    execfile('config.py', local_ns)
+    return local_ns.get('pico_tags').get(board_name)
+pico_tags = read_config(board_name = utils.board.get_board_name())
+#pico_tags = config.pico_tags.get(utils.board.get_board_name())
 assert pico_tags != None, msg
-
 
 class Vibration:
     def __init__(self):
