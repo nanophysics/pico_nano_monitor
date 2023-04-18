@@ -161,6 +161,7 @@ relais = Ssr_relais()
 
 def upload():
     global last_upload_ms
+    time.sleep_ms(10) # to get time after the outage on the trace
     baton.acquire()
     if outage_upload.uploaded: # upload was successfull last time
         if not outage_upload.worse(outage_report) and outage_upload.outage_ongoing == False:
