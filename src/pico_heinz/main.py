@@ -54,7 +54,7 @@ class DS18b20Tags:
 
 
 DS18B20_id_tags = {
-    "28D789660E00000A": {"position": "auf_tisch", "setup": "charlie"},
+    "28D789660E00000A": {"position": "nitrogen_filling_line", "setup": "fritz"},
 }
 dst = DS18b20Tags(id_tags=DS18B20_id_tags, pin="GPIO1")
 
@@ -108,8 +108,8 @@ while True:
     utils.board.set_led(value=1)
     dst.do_measure()
     dict_tag = {
-        "room": "B15",
-        "setup": "charlie",
+        "room": "B16",
+        "setup": "fritz",
         "user": "pmaerki",
         "quality": "testDeleteLater",
     }
