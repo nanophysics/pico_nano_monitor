@@ -135,7 +135,7 @@ upload_to_influx = True # if False just print, fast and reliable
 
 if upload_to_influx:
     utils.wlan.start_wlan()
-    #utils.file_updater.update_if_local()
+    utils.file_updater.update_if_local()
 
 minute_ms = 60 * 1000
 hour_ms = 60 * minute_ms
