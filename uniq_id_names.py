@@ -51,4 +51,9 @@ names_id_dict = {
         src_folder="src/vibration_temperature/",
         src_files=["main.py", "config.py"],
     ),
+    b'e661640843851c28': dict(
+        name="pico_hanna",
+        src_folder="src/pico_hanna/",
+        src_files=["main.py"],
+    ),
 }

@@ -16,6 +16,8 @@ influxFieldKeyDict = {  # Zahlenwerte
     "vibration_peak_AU": None,  # Integer
     "vibration_average_AU": None,  # Integer
     "humidity_pRH": None,
+    "flow_ln_per_min": None, # only for He flow sensor
+    "total_ln": None, # only for He flow sensor
 }
 
 influxTagKeyDict = {
@@ -40,7 +42,7 @@ influxTagKeyDict = {
         "broker",
     ],
     "position": None,  # z.B. "N2 exhaust tube"
-    "user": ["pmaerki", "benekrat", "baehler", "lostertag"],
+    "user": ["pmaerki", "benekrat", "baehler", "lostertag", "hannav"],
     "quality": ["testDeleteLater", "use"],
 }
 
