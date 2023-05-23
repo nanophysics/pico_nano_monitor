@@ -40,6 +40,7 @@ influxTagKeyDict = {
         "fritz",
         "charlie",
         "broker",
+        "HPT_nitrogen_tank",
     ],
     "position": None,  # z.B. "N2 exhaust tube"
     "user": ["pmaerki", "benekrat", "baehler", "lostertag", "hannav"],

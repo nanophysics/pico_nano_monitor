@@ -20,8 +20,8 @@ pico_tags ={
     'DS18B20_id_tags': {},
     'vibration': False},
     'pico_anke': {
-    'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {},
+    'general': {'room': 'B15', 'position': 'wallbox_powersupplies', 'setup':'HPT_nitrogen_tank', 'user': 'hannav','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {'28F996610E00003A': {'position': 'wallbox_powersupplies', 'setup':'HPT_nitrogen_tank'}},
     'vibration': False},
     'pico_hugo': {
     'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
