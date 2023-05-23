@@ -279,6 +279,7 @@ def reset_after_delay(
 _RED = micropython.const((255, 0, 0))
 _GREEN = micropython.const((0, 255, 0))
 _BLUE = micropython.const((0, 0, 255))
+_WHITE = micropython.const((255, 255, 255))
 _DARK = micropython.const((0, 0, 0))
 
 
@@ -359,10 +360,12 @@ class Wdt:
     def halt_temporary(self, value = False): # https://github.com/micropython/micropython/issues/8600
         if self._installed:
             if value:
+                board.set_led(value=True, colour=_WHITE) # This way we can find out if pico freezes while WDT halted
                 machine.mem32[0x40058000] = machine.mem32[0x40058000] & ~(1<<30)
                 log.log(f"Wdt is halted temporary", level=TRACE)
             else:
                 self.enable()
+                board.set_led(value=False, colour=_WHITE)
         
 
     def feed(self):

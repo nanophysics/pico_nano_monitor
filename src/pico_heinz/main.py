@@ -85,7 +85,7 @@ class Pressure_15_psi_sensor_ali:
 
     def get_pressure_pa(self, average_n=1000):
         voltage_V = self.adc_5V_GP0.voltage(average_n=average_n)
-        # Drucksensor absolut von Alie XIDIBEI Official Store 15 psi
+        # Drucksensor relativ von Alie XIDIBEI Official Store 15 psi, 103421 Pa
         pa_per_psi = (
             6894.75729  # https://www.unitconverters.net/pressure/psi-to-pascal.htm
         )
