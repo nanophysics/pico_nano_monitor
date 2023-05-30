@@ -274,6 +274,9 @@ def reset_after_delay(
         board.set_led(value=False)
     machine.reset()
 
+def wdt_peter_reset(k):
+    print('reset')
+    machine.reset()
 
 #WHITE = (255, 255, 255)
 _RED = micropython.const((255, 0, 0))
@@ -347,6 +350,7 @@ class Wdt:
         self._monitor_last_wdt_ms = time.ticks_ms()
         self._timeout = 8388
         self._installed = False
+        self.wdt_peter = machine.Timer(-1)
 
     def enable(self):
         if board.main_is_local:
@@ -360,12 +364,14 @@ class Wdt:
     def halt_temporary(self, value = False): # https://github.com/micropython/micropython/issues/8600
         if self._installed:
             if value:
+                self.wdt_peter.init(period=30000, mode=self.wdt_peter.ONE_SHOT, callback=wdt_peter_reset) # Selfmade WDT with no time limit.
                 board.set_led(value=True, colour=_WHITE) # This way we can find out if pico freezes while WDT halted
                 machine.mem32[0x40058000] = machine.mem32[0x40058000] & ~(1<<30)
                 log.log(f"Wdt is halted temporary", level=TRACE)
             else:
                 self.enable()
                 board.set_led(value=False, colour=_WHITE)
+                self.wdt_peter.deinit()
         
 
     def feed(self):
