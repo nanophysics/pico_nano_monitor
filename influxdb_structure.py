@@ -23,7 +23,7 @@ influxFieldKeyDict = {  # Zahlenwerte
 }
 
 influxTagKeyDict = {
-    "room": ["A", "C15", "C17", "C18", "B15", "B16", "B17", "D24", "E9", "p"],
+    "room": ["A", "C15", "C17", "C18", "B15", "B16", "B17", "D24", "E9"],
     "setup": [
         "bigmom",
         "zeus",
@@ -43,7 +43,6 @@ influxTagKeyDict = {
         "charlie",
         "broker",
         "HPT_nitrogen_tank",
-        "peter",
     ],
     "position": None,  # z.B. "N2 exhaust tube"
     "user": ["pmaerki", "benekrat", "baehler", "lostertag", "hannav"],
