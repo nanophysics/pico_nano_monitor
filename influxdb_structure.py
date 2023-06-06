@@ -6,12 +6,14 @@ influxFieldKeyDict = {  # Zahlenwerte
     "pressure_Pa_rel": None,
     "pressure_Pa_abs": None,
     "resistance_Ohm": None,
+    "voltage_V": None,
     "flow_m3_per_s": None,
     "flow_mol_per_s": None,
     "powerOutage_s": None,
     "outage_trace_V": None,
     "power_W": None,
     "uptime_s": None,
+    "number_i": None,
     "binary_state": None,  # True False
     "vibration_peak_AU": None,  # Integer
     "vibration_average_AU": None,  # Integer
@@ -21,7 +23,7 @@ influxFieldKeyDict = {  # Zahlenwerte
 }
 
 influxTagKeyDict = {
-    "room": ["A", "C15", "C17", "C18", "B15", "B16", "B17", "D24", "E9"],
+    "room": ["A", "C15", "C17", "C18", "B15", "B16", "B17", "D24", "E9", "p"],
     "setup": [
         "bigmom",
         "zeus",
@@ -41,6 +43,7 @@ influxTagKeyDict = {
         "charlie",
         "broker",
         "HPT_nitrogen_tank",
+        "peter",
     ],
     "position": None,  # z.B. "N2 exhaust tube"
     "user": ["pmaerki", "benekrat", "baehler", "lostertag", "hannav"],

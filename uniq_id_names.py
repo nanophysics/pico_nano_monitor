@@ -56,4 +56,14 @@ names_id_dict = {
         src_folder="src/pico_hanna/",
         src_files=["main.py"],
     ),
+    b'e661ac88631c6326': dict(
+        name="pico_puent",
+        src_folder="src/pico_puent_zd",
+        src_files=["main.py"],
+    ),
+    b'e661ac88630e8a26': dict(
+        name="pico_bochs",
+        src_folder="src/pico_bochs_zd",
+        src_files=["main.py"],
+    ),
 }
