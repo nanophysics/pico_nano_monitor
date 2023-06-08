@@ -153,7 +153,7 @@ while True:
         DS_dict = dst.tags(sensor)
         DS_dict.update(dict_tag)
         utils.mmts.append(
-            {"tags": dict_tag, "fields": {"temperature_C": dst.measure_influx(sensor)}}
+            {"tags": DS_dict, "fields": {"temperature_C": dst.measure_influx(sensor)}}
         )
     if measurement_counter == 0 or not pico_tags.get(
         "vibration"

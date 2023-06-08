@@ -16,8 +16,13 @@ pico_tags ={
     'DS18B20_id_tags': {},
     'vibration': False},
     'pico_zoe': {
-    'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {},
+    'general': {'room': 'A', 'user': 'baehler','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {
+    '28CAAB610E0000E6': {'setup':'titan', 'position': 'pump_3he' },
+    '288DE1660E0000C4': {'setup':'titan', 'position': 'pump_1k_pot'},
+    '285BCE660E000025': {'setup':'fritz', 'position': 'pump_3he'},
+    '28D2A4770E000042': {'setup':'fritz', 'position': 'pump_1k_pot'},
+    },
     'vibration': False},
     'pico_anke': {
     'general': {'room': 'B15', 'position': 'wallbox_powersupplies', 'setup':'HPT_nitrogen_tank', 'user': 'hannav','quality': 'testDeleteLater'},
