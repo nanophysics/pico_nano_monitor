@@ -12,6 +12,16 @@ import _thread
 
 micropython.alloc_emergency_exception_buf(100)
 
+utils.wdt.enable()
+utils.log.enable_oled()  # comment out if there is no oled
+
+upload_to_influx = micropython.const(True) # if False just print, fast and reliable
+
+if upload_to_influx:
+    utils.wlan.start_wlan()
+    utils.file_updater.update_if_local()
+
+
 # for debuging
 debug_pin_gp14 = machine.Pin(14, machine.Pin.OUT) #number is GPx
 debug_pin_gp16 = machine.Pin(16, machine.Pin.OUT) #number is GPx
@@ -20,7 +30,7 @@ debug_pin_gp16.value(0)
 
 class Log_file:
     def __init__(self):
-        self.filename = 'log_file.txt'
+        self.filename = micropython.const('log_file.txt')
         self.enabled = False
         self._log_file = None
         self.outage_test_measured_ms = 0
@@ -84,7 +94,7 @@ class Outage:
         self.uploaded = False
 
 
-trace_array_len = 1000
+trace_array_len = micropython.const(1000)
 outage_actual = Outage( trace_array_len = trace_array_len )
 outage_report = Outage()
 outage_upload = Outage( trace_array_len = trace_array_len)
@@ -94,7 +104,7 @@ adc26 = machine.ADC(machine.Pin(26))
 baton = _thread.allocate_lock()
 
 def thread_sample():
-    interval_us = 1000
+    interval_us = micropython.const(1000)
     next_time_us = time.ticks_us()
     while True:
         baton.acquire()
@@ -128,17 +138,10 @@ def thread_sample():
 
 
 
-utils.wdt.enable()
-utils.log.enable_oled()  # comment out if there is no oled
 
-upload_to_influx = True # if False just print, fast and reliable
 
-if upload_to_influx:
-    utils.wlan.start_wlan()
-    utils.file_updater.update_if_local()
-
-minute_ms = 60 * 1000
-hour_ms = 60 * minute_ms
+minute_ms = micropython.const(60 * 1000)
+hour_ms = micropython.const(60 * minute_ms)
 utils.time_manager.set_period_restart_ms(
     time_restart_ms=6 * hour_ms + random.randrange(10 * minute_ms)
 )  # will reset after this time
@@ -229,9 +232,9 @@ def upload():
 last_upload_ms = time.ticks_diff(time.ticks_ms(), 20000)
 start_up_ms = time.ticks_ms()
 
-MIN_MS = 60 * 1000
+MIN_MS = micropython.const(60 * 1000)
 
-periodic_upload_without_outage_min = 10
+periodic_upload_without_outage_min = micropython.const(10)
 
 
 def upload_check(upload_success = True):
@@ -261,11 +264,11 @@ time.sleep_ms(50)
 class Sceduler:
     def __init__(self):
         self.ticks_last_time_manager_ms = time.ticks_ms()
-        self.ticks_last_time_manager_interval_ms = 1000
+        self.ticks_last_time_manager_interval_ms = micropython.const(1000)
         self.ticks_last_upload_check_ms = time.ticks_ms()
-        self.ticks_last_upload_check_interval_ms = 50
+        self.ticks_last_upload_check_interval_ms = micropython.const(50)
         self.ticks_last_log_print_ms = time.ticks_ms()
-        self.ticks_last_log_print_interval_ms = 4000
+        self.ticks_last_log_print_interval_ms = micropython.const(4000)
 
     def sleep_ms(self, sleep_ms=0): # Use this instead of time.sleep in order to get things done!
         ticks_sleep_end_ms = time.ticks_add(time.ticks_ms(), sleep_ms)
