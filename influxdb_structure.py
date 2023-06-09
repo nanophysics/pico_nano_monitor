@@ -7,6 +7,7 @@ influxFieldKeyDict = {  # Zahlenwerte
     "pressure_Pa_abs": None,
     "resistance_Ohm": None,
     "voltage_V": None,
+    "current_A": None,
     "flow_m3_per_s": None,
     "flow_mol_per_s": None,
     "powerOutage_s": None,

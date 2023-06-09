@@ -28,8 +28,7 @@ names_id_dict = {
     b"e6614104034a572f": dict(
         name="pico_hugo",
         src_folder="src/pico_hugo/",
-        src_folder="src/vibration_temperature/",
-        src_files=["main.py", "config.py"],
+        src_files=["main.py"],
     ),
     b"e6616407e3396d2a": dict(
         name="pico_rosa",
