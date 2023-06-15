@@ -120,7 +120,7 @@ while True:
         credentials='nano_monitor'
     )  # 'peter_influx_com'   'nano_monitor'
 
-    while utils.time_manager.need_to_wait(update_period_ms=10 * minute_ms):
+    while utils.time_manager.need_to_wait(update_period_ms=30 * minute_ms):
         pass
 
 
