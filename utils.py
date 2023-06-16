@@ -139,7 +139,7 @@ key0 = Key(GPx=15)
 key1 = Key(GPx=17)
 log = Log()
 
-GITHUB_URL = "https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main/"  # use a / at the end
+GITHUB_URL = micropython.const("https://raw.githubusercontent.com/nanophysics/pico_nano_monitor/main/")  # use a / at the end
 
 
 class Ota_git:
@@ -206,39 +206,6 @@ class Ota_git:
         else:
             log.log(f"ok :{file}", level=INFO)
             return 0
-
-    def _compare_strings(
-        self, str_local, str_git
-    ):  # in case we search for strange effects
-        str_local = "".join(c for c in str_local if c != "\r")
-        str_local_length = len(str_local)
-        str_git_length = len(str_git)
-        max_length = max(str_local_length, str_git_length)
-        local = None
-        remote = None
-        counter = 0
-        counter_line = 0
-        counter_char = 0
-        for element in range(0, max_length - 1):
-            if element < str_local_length:
-                counter_char += 1
-                local = str_local[element]
-                if local == "\n":
-                    counter_line += 1
-                    counter_char = 0
-                local = repr(local)
-            if element < str_git_length:
-                remote = repr(str_git[element])
-            if local != remote:
-                print(
-                    f"Line: {counter_line}, character nr. {counter_char} local: {local} remote: {remote}"
-                )
-                counter += 1
-                if counter > 40:
-                    break
-        print(str_local[0:400])
-        print(str_git[0:400])
-
 
 ota_git = Ota_git()
 
@@ -359,7 +326,7 @@ class Wdt:
     def __init__(self):
         self._wdt = None
         self._monitor_last_wdt_ms = time.ticks_ms()
-        self._timeout = 8388
+        self._timeout = micropython.const(8388)
         self._installed = False
         self.wdt_peter = machine.Timer(-1)
 
