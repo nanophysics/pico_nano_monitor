@@ -32,29 +32,5 @@ pico_tags ={
     'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {'28BF0FA40E000001': {'position': 'unter_tisch', 'setup':'emma'}},
     'vibration': False},
-    'pico_linn': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
-    'pico_maya': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
-    'pico_ida': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
-    'pico_pia': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
-    'pico_joy': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
-    'pico_lucy': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
 }
 
