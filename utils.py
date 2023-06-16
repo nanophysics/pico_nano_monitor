@@ -187,8 +187,8 @@ class Ota_git:
         return sha
 
     def update_file_if_changed(self, url="", file="", remote_folder=""):
-        sha_local = self._get_local_sha256(file=file)
         str_git = self._get_remote_file(url=url, remote_folder=remote_folder, file=file)
+        sha_local = self._get_local_sha256(file=file)
         #log.log(f"file: {file}?", level=INFO)
         gc.collect()
         hash = hashlib.sha256()
