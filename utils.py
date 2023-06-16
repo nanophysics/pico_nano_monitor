@@ -13,6 +13,7 @@ import oled_1_3
 import influxdb_structure
 import neopixel
 import micropython
+import hashlib
 
 gc.enable()
 
@@ -177,15 +178,25 @@ class Ota_git:
         if len(text) == 0:  # seams to be wrong
             return ""
         return text
+    
+    def _get_local_sha256(self, file=""):
+        wdt.feed()
+        hash = hashlib.sha256()
+        hash.update(self._get_local_file(file=file))
+        sha = hash.digest()
+        return sha
 
     def update_file_if_changed(self, url="", file="", remote_folder=""):
+        sha_local = self._get_local_sha256(file=file)
         str_git = self._get_remote_file(url=url, remote_folder=remote_folder, file=file)
         #log.log(f"file: {file}?", level=INFO)
         gc.collect()
-        #log.log(f"str_git:{str_git}", level=INFO)
-        #gc.collect()
-        str_local = self._get_local_file(file=file)
-        if str_local != str_git:
+        hash = hashlib.sha256()
+        hash.update(str_git)
+        sha_git = hash.digest()
+        del hash
+        gc.collect()
+        if sha_git != sha_local:
             wdt.feed()
             f = open(file, "w")
             f.write(str_git)
