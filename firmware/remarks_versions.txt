@@ -1,0 +1,15 @@
+Peter Maerki 2023-06-16_20_15_12
+
+Remote File update klappt nicht mit rp2-pico-w-20230426-v1.20.0.uf2
+
+
+mit dem
+
+rp2-pico-w-20230615-unstable-v1.20.0-219-g47dc7d013.uf2
+
+geht es.
+
+Also bei allen den 
+rp2-pico-w-20230615-unstable-v1.20.0-219-g47dc7d013.uf2
+
+drauf.
