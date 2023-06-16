@@ -65,4 +65,34 @@ names_id_dict = {
         src_folder="src/pico_puent_zd/",
         src_files=["main.py"],
     ),
+    b'e661ac8863592a24': dict( # temporaer
+        name="pico_joy",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+    b'e661ac88636e0d24': dict( # temporaer
+        name="pico_pia",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+    b'e661ac88633d3c22': dict( # temporaer
+        name="pico_lucy",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+    b'e661ac88637a7d27': dict( # temporaer
+        name="pico_maya",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+    b'e661ac88633b0b25': dict( # temporaer
+        name="pico_ida",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+    b'e661ac88636d9027': dict( # temporaer
+        name="pico_linn",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
 }
