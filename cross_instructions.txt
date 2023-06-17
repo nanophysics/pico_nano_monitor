@@ -1,0 +1,15 @@
+.mpy erstellen
+
+
+https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-python-sdk.pdf
+
+
+cmd.exe
+
+
+
+mkdir pico
+cd pico
+git clone -b master https://github.com/micropython/micropython.git
+cd micropython
+make -C ports/rp2 submodules

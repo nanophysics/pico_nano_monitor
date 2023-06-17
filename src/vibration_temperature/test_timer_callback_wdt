@@ -1,0 +1,15 @@
+import machine
+import time
+
+led = machine.Pin("LED", machine.Pin.OUT)
+
+def wdt_peter_reset(k):
+    print('reset')
+    machine.reset()
+    
+led.value(True)
+wdt_peter = machine.Timer(-1)
+wdt_peter.init(period=30000, mode=wdt_peter.ONE_SHOT, callback=wdt_peter_reset)
+#wdt_peter.deinit()
+while True:
+    time.sleep_ms(1000)

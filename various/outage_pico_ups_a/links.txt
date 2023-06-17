@@ -1,0 +1,3 @@
+https://www.waveshare.com/wiki/Pico-UPS-A
+
+GP6 and GP7 are used by oled as well. 
