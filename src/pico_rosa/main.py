@@ -3,6 +3,10 @@ for debuging: delete file main.py on RP2. Execute main.py with Thonny from PC
 for final use: put main.py on RP2 
 """
 
+# hat gut funktioniert mit v1.19.1-992-g38e7b842c on 2023-03-23; Raspberry Pi Pico W with RP2040
+# hat gut funktoiniert mit rp2-pico-w-20230615-unstable-v1.20.0-219-g47dc7d013_gut.uf2
+
+
 import time
 import machine
 import utils

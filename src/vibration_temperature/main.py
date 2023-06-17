@@ -174,9 +174,14 @@ while True:
     )
     measurement_counter += 1
     # print(utils.mmts.measurements)
+    cred = 'nano_monitor' # default
+    cred_config = pico_tags.get('credentials')
+    if cred_config is not None:
+        cred = cred_config
+    print(cred)
     utils.mmts.upload_to_influx(
-        credentials='nano_monitor'
-    )  # 'peter_influx_com'   'nano_monitor'
+        credentials=cred
+    )  # 'peter_influx_com'   'nano_monitor','peter_maerki_com'
 
     while utils.time_manager.need_to_wait(update_period_ms=10 * minute_ms):
         pass

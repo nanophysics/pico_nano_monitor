@@ -65,7 +65,7 @@ names_id_dict = {
         src_folder="src/pico_puent_zd/",
         src_files=["main.py"],
     ),
-    b'e661ac8863592a24': dict( # temporaer
+    b'e661ac8863592a24': dict( # Schaer Peter
         name="pico_joy",
         src_folder="src/vibration_temperature/",
         src_files=["main.py", "config.py"],
