@@ -51,10 +51,6 @@ pico_tags ={
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
     'vibration': False},
-    'pico_maya': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
     'pico_ida': {
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
