@@ -66,9 +66,5 @@ pico_tags ={
     '2826BF0E0F000070': {'position': 'zelg_38_speicher_mitte'}, 
     '2873343F0E000062': {'position': 'zelg_38_fernleitung_hot'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
-    'pico_lucy': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
 }
 
