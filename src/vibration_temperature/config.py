@@ -24,9 +24,24 @@ pico_tags ={
     '28D2A4770E000042': {'setup':'fritz', 'position': 'pump_1k_pot'},
     },
     'vibration': False},
-    'pico_anke': {
-    'general': {'room': 'B15', 'position': 'wallbox_powersupplies', 'setup':'HPT_nitrogen_tank', 'user': 'hannav','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28F996610E00003A': {'position': 'wallbox_powersupplies', 'setup':'HPT_nitrogen_tank'}},
+    'pico_lia': {
+    'general': {'room': 'A', 'user': 'baehler','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {
+    '2814FB6A3C1901A1': {'setup':'tarzan', 'position': 'pump_3he_forepump' },
+    '28E8EC6B3C19010C': {'setup':'tarzan', 'position': 'pump_3he_compressor'},
+    '28E62D763C190155': {'position': 'b17_cooling_water_feed'},
+    '28EFB5610E000065': {'setup':'bigmom', 'position': 'pump_3he_forepump' },
+    '28EBB95F0E0000C5': {'setup':'bigmom', 'position': 'pump_3he_compressor'},
+    '28FFA16E3C190156': {'setup':'zeus', 'position': 'pump_3he_forepump' },
+    '28CB4F6A3C190111': {'setup':'zeus', 'position': 'pump_3he_compressor'},
+    },
+    'vibration': False},
+    'pico_maya': {
+    'general': {'room': 'C15', 'user': 'baehler','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {
+    '280D75620E000088': {'setup':'anna', 'position': 'pump' },
+    '28F996610E00003A': {'setup':'emma', 'position': 'pump'},
+    },
     'vibration': False},
     'pico_hugo': {
     'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},

@@ -6,3 +6,4 @@ fridge_monitoring/directory_to_watch/22-06-29/Channels 22-06-29.log
 fridge_monitoring/directory_to_watch/22-06-29/Flowmeter 22-06-29.log
 fridge_monitoring/directory_to_watch/22-06-29/Heaters 23-01-24.log
 fridge_monitoring/directory_to_watch/22-06-29/maxigauge 22-06-29.log
+src/vibration_temperature/secrets_peter_schaer/secrets.py

@@ -46,7 +46,7 @@ names_id_dict = {
         src_files=["main.py", "config.py"],
     ),
     b"e6616408432f9e27": dict(
-        name="pico_anke",
+        name="pico_lia",
         src_folder="src/vibration_temperature/",
         src_files=["main.py", "config.py"],
     ),
