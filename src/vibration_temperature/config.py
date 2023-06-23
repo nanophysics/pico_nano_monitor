@@ -24,7 +24,7 @@ pico_tags ={
     '28D2A4770E000042': {'setup':'fritz', 'position': 'pump_1k_pot'},
     },
     'vibration': False},
-    'pico_lia': {
+    'pico_lucy': {
     'general': {'room': 'A', 'user': 'baehler','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {
     '2814FB6A3C1901A1': {'setup':'tarzan', 'position': 'pump_3he_forepump' },
