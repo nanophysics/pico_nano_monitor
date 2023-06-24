@@ -47,10 +47,6 @@ pico_tags ={
     'general': {'room': 'B15', 'position': 'miapos', 'setup':'charlie', 'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {'28BF0FA40E000001': {'position': 'unter_tisch', 'setup':'emma'}},
     'vibration': False},
-    'pico_linn': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
     'pico_pia': {
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
@@ -68,6 +64,14 @@ pico_tags ={
     '2891D3683C190161': {'position': 'zelg_37_speicher_oben'}, 
     '28F4926B3C1901E5': {'position': 'zelg_37_speicher_mitte'}, 
     '28FEDE763C190147': {'position': 'zelg_37_speicher_unten'}},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
+
+    'pico_linn': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {
+    '28752F400E0000EE': {'position': 'bochs_fernleitung_hot'}, 
+    '287830400E0000B7': {'position': 'bochs_fernleitung_cold'}, 
+    '28F2305B3C1901AF': {'position': 'bochs_heizungsraum'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
 }
 
