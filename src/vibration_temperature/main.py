@@ -104,6 +104,7 @@ class DS18b20Tags:
         self._id_tags = id_tags
         self._ds = ds = DS18X20(OneWire(machine.Pin(pin)))  # pin corresponds to GPx
         self.sensors = ds.scan()
+        self.sensors.sort()
         if self.sensors:
             self._ds.convert_temp()  # after power on reset the value is wrong. Therefore measure here once.
             time.sleep_ms(

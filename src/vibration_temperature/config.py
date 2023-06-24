@@ -51,10 +51,6 @@ pico_tags ={
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
     'vibration': False},
-    'pico_ida': {
-    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
-    'vibration': False},
     'pico_pia': {
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {'28EFB5610E000065': {}}, # temporary
@@ -65,6 +61,13 @@ pico_tags ={
     '28FA720E0F000007': {'position': 'zelg_38_speicher_unten'}, 
     '2826BF0E0F000070': {'position': 'zelg_38_speicher_mitte'}, 
     '2873343F0E000062': {'position': 'zelg_38_fernleitung_hot'}},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
+    'pico_ida': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {
+    '2891D3683C190161': {'position': 'zelg_37_speicher_oben'}, 
+    '28F4926B3C1901E5': {'position': 'zelg_37_speicher_mitte'}, 
+    '28FEDE763C190147': {'position': 'zelg_37_speicher_unten'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
 }
 
