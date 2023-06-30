@@ -1,3 +1,17 @@
+https://learn.adafruit.com/adafruit-i2c-fram-breakout/pinouts
+
+Distrelec 301-39-068
+
+VCC auf 3.3V  PCB Pin 36
+GND auf GND
+WP to gnd
+SCL  PCB Pin 25  GP19 I2C1 SCL
+SDA  PCB Pin 24  GP18 I2C1 SDA
+A0, A1, A2 to gnd, Adress 0x50
+
+
+
+
 https://github.com/peterhinch/micropython_eeprom
 
 

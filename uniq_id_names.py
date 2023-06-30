@@ -45,11 +45,6 @@ names_id_dict = {
         src_folder="src/vibration_temperature/",
         src_files=["main.py", "config.py"],
     ),
-    b"e6616408432f9e27": dict(
-        name="pico_lia",
-        src_folder="src/vibration_temperature/",
-        src_files=["main.py", "config.py"],
-    ),
     b'e661640843851c28': dict(
         name="pico_hanna",
         src_folder="src/pico_hanna/",
@@ -92,6 +87,26 @@ names_id_dict = {
     ),
     b'e661ac88636d9027': dict( # temporaer
         name="pico_linn",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+    b'e6614864d3721027': dict(
+        name="pico_lia",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+    b'e6614864d356bb21': dict(
+        name="pico_leo",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+    b'e6614864d35d9f21': dict(
+        name="pico_luz",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+    b'e6614864d37a1527': dict(
+        name="pico_evi",
         src_folder="src/vibration_temperature/",
         src_files=["main.py", "config.py"],
     ),

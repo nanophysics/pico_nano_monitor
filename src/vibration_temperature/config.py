@@ -52,7 +52,8 @@ pico_tags ={
     'DS18B20_id_tags': {'2846B00D0F000054': {'position': 'zelg_38_speicher_oben'}, 
     '28FA720E0F000007': {'position': 'zelg_38_speicher_unten'}, 
     '2826BF0E0F000070': {'position': 'zelg_38_speicher_mitte'}, 
-    '2873343F0E000062': {'position': 'zelg_38_fernleitung_hot'}},
+    '2873343F0E000062': {'position': 'zelg_38_fernleitung_hot'},
+    '28CEBF660E0000DF': {'position': 'zelg_38_fernleitung_cold'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
     'pico_ida': {
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
@@ -76,6 +77,11 @@ pico_tags ={
     '2884BA3F0E0000FC': {'position': 'puent_fernleitung_hot'}, 
     '28ADC83F0E000032': {'position': 'puent_fernleitung_cold'}, 
     '2848D86B3C1901CB': {'position': 'puent_heizungsraum'}},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
+
+    'pico_lia': { # temporary
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {'28CEBF660E0000DF': {'position': 'zelg_38_fernleitung_cold'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
 }
 
