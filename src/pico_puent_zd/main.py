@@ -19,7 +19,7 @@ utils.time_manager.set_period_restart_ms(
     time_restart_ms=6 * hour_ms + random.randrange(5 * minute_ms)
 )  # will reset after this time
 
-
+Ventile_Offen_pin = machine.Pin("GPIO22", machine.Pin.IN)
 
 class Adc_GP26:
     def __init__(self):
@@ -69,6 +69,8 @@ def messen():
         house_i_change = True
         house_i_last = house_i
 
+ventile_offen_last = None
+
 while True:
     utils.board.set_led(value=1)
     messen()
@@ -96,6 +98,15 @@ while True:
             }
         )
     utils.mmts.append(
+        {
+            "tags": dict_tag,
+            "fields": {
+                "binary_state": "%i"     
+                % Ventile_Offen_pin.value()
+            },
+        }
+    )
+    utils.mmts.append(
         {"tags": dict_tag, "fields": {"uptime_s": "%d" % utils.time_manager.uptime_s()}}
     )
 
@@ -105,10 +116,15 @@ while True:
 
     house_i_change = False
 
+
+
     while utils.time_manager.need_to_wait(update_period_ms=60 * minute_ms) and not house_i_change: # if house_i_change, it will upload imediatly
         messen()
         if house_i != 0:
             utils.log.log(f'{voltage_V:.1f} V: Haus {house_i:d}')
         else:
             utils.log.log(f'{voltage_V:.1f} V: Haus --')
-        pass
+        ventile_offen = Ventile_Offen_pin.value()
+        if ventile_offen_last != ventile_offen:
+            ventile_offen_last = ventile_offen
+            break
