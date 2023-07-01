@@ -85,15 +85,16 @@ while True:
             },
         }
     )
-    utils.mmts.append(
-        {
-            "tags": dict_tag,
-            "fields": {
-                "number_i": "%d"
-                % house_i
-            },
-        }
-    )
+    if house_i != 0:
+        utils.mmts.append(
+            {
+                "tags": dict_tag,
+                "fields": {
+                    "number_i": "%d"
+                    % house_i
+                },
+            }
+        )
     utils.mmts.append(
         {"tags": dict_tag, "fields": {"uptime_s": "%d" % utils.time_manager.uptime_s()}}
     )
@@ -106,5 +107,8 @@ while True:
 
     while utils.time_manager.need_to_wait(update_period_ms=60 * minute_ms) and not house_i_change: # if house_i_change, it will upload imediatly
         messen()
-        utils.log.log(f'{voltage_V:.1f} V: Haus {house_i:d}')
+        if house_i != 0:
+            utils.log.log(f'{voltage_V:.1f} V: Haus {house_i:d}')
+        else:
+            utils.log.log(f'{voltage_V:.1f} V: Haus --')
         pass
