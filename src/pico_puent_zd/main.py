@@ -80,7 +80,7 @@ while True:
         {
             "tags": dict_tag,
             "fields": {
-                "voltage_V": "%0.3f"
+                "voltage_V": "%4.1f"
                 % voltage_V
             },
         }
