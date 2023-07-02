@@ -83,6 +83,16 @@ pico_tags ={
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {'28CEBF660E0000DF': {'position': 'zelg_38_fernleitung_cold'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
+
+    'pico_leo': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {
+    '2840D3660E000016': {'position': 'zelg_42_speicher_oben'}, 
+    '28B829660E0000DE': {'position': 'zelg_42_speicher_mitte'}, 
+    '28F0C8660E00001D': {'position': 'zelg_42_speicher_unten'}},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
+
+
 }
 
 
