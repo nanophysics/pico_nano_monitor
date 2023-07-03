@@ -103,7 +103,7 @@ outage_actual = Outage( trace_array_len = trace_array_len )
 outage_report = Outage()
 outage_upload = Outage( trace_array_len = trace_array_len)
 
-adc26 = machine.ADC(machine.Pin(26))
+adc26 = machine.ADC(machine.Pin("GPIO28"))
 
 baton = _thread.allocate_lock()
 
