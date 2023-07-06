@@ -33,10 +33,11 @@ class Adc_GP26:
         Roben = 150000.0
         Ifs = uref_V / Runten
         fs_V = (Runten + Roben) * Ifs
+        korrekturfaktor = 1.00306
         value_n = 0
         for i in range(average_n):
             value_n += self.adc.read_u16()
-        return float(value_n) / average_n / 2 ** 16 * fs_V
+        return float(value_n) / average_n / 2 ** 16 * fs_V * korrekturfaktor
 
 adc_V = Adc_GP26()
 
@@ -82,7 +83,7 @@ while True:
         {
             "tags": dict_tag,
             "fields": {
-                "voltage_V": "%4.1f"
+                "voltage_V": "%.3f"
                 % voltage_V
             },
         }
@@ -121,9 +122,9 @@ while True:
     while utils.time_manager.need_to_wait(update_period_ms=60 * minute_ms) and not house_i_change: # if house_i_change, it will upload imediatly
         messen()
         if house_i != 0:
-            utils.log.log(f'{voltage_V:.1f} V: Haus {house_i:d}')
+            utils.log.log(f'{voltage_V:4.1f} V: Haus {house_i:d}')
         else:
-            utils.log.log(f'{voltage_V:.1f} V: Haus --')
+            utils.log.log(f'{voltage_V:4.3f} V: Haus --')
         ventile_offen = Ventile_Offen_pin.value()
         if ventile_offen_last != ventile_offen:
             ventile_offen_last = ventile_offen
