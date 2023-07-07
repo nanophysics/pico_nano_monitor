@@ -124,7 +124,7 @@ while True:
         if house_i != 0:
             utils.log.log(f'{voltage_V:4.1f} V: Haus {house_i:d}')
         else:
-            utils.log.log(f'{voltage_V:4.3f} V: Haus --')
+            utils.log.log(f'{voltage_V:4.1f} V: Haus --')
         ventile_offen = Ventile_Offen_pin.value()
         if ventile_offen_last != ventile_offen:
             ventile_offen_last = ventile_offen
