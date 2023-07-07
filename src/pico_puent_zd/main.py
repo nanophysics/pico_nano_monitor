@@ -88,7 +88,7 @@ while True:
             },
         }
     )
-    if house_i != 0:
+    if house_i != 0 and house_i_change is False:
         utils.mmts.append(
             {
                 "tags": dict_tag,
