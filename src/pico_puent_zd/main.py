@@ -50,6 +50,7 @@ house_i_change = True
 
 def messen():
     global voltage_V, house_i, house_i_last, house_i_change
+    time.sleep_ms(100)
     voltage_V = adc_V.voltage(average_n = 10000)
     voltage_i = int(voltage_V+0.5)
     house_i = None
