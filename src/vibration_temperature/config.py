@@ -92,7 +92,13 @@ pico_tags ={
     '28F0C8660E00001D': {'position': 'zelg_42_speicher_unten'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
 
-
+    'pico_lia': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {
+    '282A266C3C1901E4': {'position': 'zelg_47_speicher_oben'}, 
+    '2854BF693C1901AA': {'position': 'zelg_47_speicher_mitte'}, 
+    '287A2F773C190195': {'position': 'zelg_47_speicher_unten'}},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
 }
 
 
