@@ -30,7 +30,7 @@ names_id_dict = {
         src_folder="src/pico_hugo/",
         src_files=["main.py"],
     ),
-    b"e6616407e3396d2a": dict(
+    b"e6614864d35d9f21": dict(      # war frueher e6616407e3396d2a welche defekt ist
         name="pico_rosa",
         src_folder="src/pico_rosa/",
         src_files=["main.py"],
@@ -100,11 +100,11 @@ names_id_dict = {
         src_folder="src/vibration_temperature/",
         src_files=["main.py", "config.py"],
     ),
-    b'e6614864d35d9f21': dict(
-        name="pico_luz",
-        src_folder="src/vibration_temperature/",
-        src_files=["main.py", "config.py"],
-    ),
+    # b'e6614864d35d9f21': dict( # neu bei rosa eingesetzt
+    #     name="pico_luz",
+    #     src_folder="src/vibration_temperature/",
+    #     src_files=["main.py", "config.py"],
+    # ),
     b'e6614864d37a1527': dict(
         name="pico_evi",
         src_folder="src/vibration_temperature/",
