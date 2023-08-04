@@ -68,7 +68,8 @@ pico_tags ={
     'DS18B20_id_tags': {
     '28752F400E0000EE': {'position': 'bochs_fernleitung_hot'}, 
     '287830400E0000B7': {'position': 'bochs_fernleitung_cold'}, 
-    '28F2305B3C1901AF': {'position': 'bochs_heizungsraum'}},
+    '283778650E0000C0': {'position': 'bochs_heizungsraum'}},
+    # defekt '28F2305B3C1901AF': {'position': 'bochs_heizungsraum'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
 
     'pico_pia': {
@@ -98,6 +99,14 @@ pico_tags ={
     '282A266C3C1901E4': {'position': 'zelg_47_speicher_oben'}, 
     '2854BF693C1901AA': {'position': 'zelg_47_speicher_mitte'}, 
     '287A2F773C190195': {'position': 'zelg_47_speicher_unten'}},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
+
+    'pico_evi': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {
+    '2826C26A3C190155': {'position': 'zelg_53_speicher_oben'}, 
+    '2848D56F3C190129': {'position': 'zelg_53_speicher_mitte'}, 
+    '28CE456A3C190147': {'position': 'zelg_53_speicher_unten'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
 }
 
