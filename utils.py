@@ -218,7 +218,7 @@ class FileUpdater:
         gc.collect()
         if board.main_is_local():
             log.log("new files?", level=INFO)
-            files = ["utils.py", "uniq_id_names.py", "oled_1_3.py"]
+            files = ["uniq_id_names.py", "utils.py", "oled_1_3.py"]
             updates = 0
             for file in files:
                 updates += ota_git.update_file_if_changed(url=GITHUB_URL, file=file)
