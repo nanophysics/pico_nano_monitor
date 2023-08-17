@@ -108,6 +108,31 @@ pico_tags ={
     '2848D56F3C190129': {'position': 'zelg_53_speicher_mitte'}, 
     '28CE456A3C190147': {'position': 'zelg_53_speicher_unten'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
+
+    'pico_anna': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
+
+    'pico_ria': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
+
+    'pico_lina': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
+
+    'pico_enja': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
+
+    'pico_klara': {
+    'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
+    'DS18B20_id_tags': {},
+    'vibration': False, 'credentials': 'peter_maerki_com'},
 }
 
 

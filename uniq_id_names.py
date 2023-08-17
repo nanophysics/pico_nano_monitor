@@ -110,4 +110,34 @@ names_id_dict = {
         src_folder="src/vibration_temperature/",
         src_files=["main.py", "config.py"],
     ),
+
+    b'e6614864d31b8b21': dict(
+        name="pico_anna",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+
+    b'e6614864d33dab22': dict(
+        name="pico_ria",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+
+    b'e6613852835f1b25': dict(
+        name="pico_lina",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+
+    b'e6614864d352b321': dict(
+        name="pico_enja",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
+
+    b'e6613852831b3b25': dict(
+        name="pico_klara",
+        src_folder="src/vibration_temperature/",
+        src_files=["main.py", "config.py"],
+    ),
 }
