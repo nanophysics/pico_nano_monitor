@@ -121,8 +121,9 @@ pico_tags ={
 
     'pico_lina': {
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {},
-    'vibration': False, 'credentials': 'peter_maerki_com'},
+    'DS18B20_id_tags': {
+	'28FD17B50E0000EF': {'position': 'testposition_tisch'}},
+    'vibration': False},
 
     'pico_enja': {
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
