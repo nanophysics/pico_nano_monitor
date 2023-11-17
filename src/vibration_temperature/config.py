@@ -132,7 +132,9 @@ pico_tags ={
 
     'pico_klara': {
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
-    'DS18B20_id_tags': {},
+    'DS18B20_id_tags': {
+    '2813A5623C19010F': {'position': 'zelg_49_temporaer_A'}, 
+    '2888F97C3C1901DF': {'position': 'zelg_49_temporaer_B'},},
     'vibration': False, 'credentials': 'peter_maerki_com'},
 }
 
