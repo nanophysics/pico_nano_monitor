@@ -11,3 +11,6 @@ src/vibration_temperature/secrets_andi/secrets.py
 various/beschriftung/
 /src/vibration_temperature/secrets_puenterswis_garage
 /src/vibration_temperature/secrets_bochslen_garage
+/**/*secrets*
+/**/*.pyc*
+/**/*gitignore*
