@@ -19,6 +19,8 @@ micropython.alloc_emergency_exception_buf(100)
 utils.wdt.enable()
 utils.log.enable_oled()  # comment out if there is no oled
 
+utils.log.avoid_burnIn = True
+
 upload_to_influx = micropython.const(True) # if False just print, fast and reliable
 
 if upload_to_influx:
