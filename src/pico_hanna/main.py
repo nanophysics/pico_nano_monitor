@@ -23,6 +23,8 @@ utils.time_manager.set_period_restart_ms(
 
 debug_fix_flow = False
 
+utils.log.avoid_burnIn = True
+
 fram_initialize_to_zero = False # in case you want to start from scratch
 
 class FRAM:
