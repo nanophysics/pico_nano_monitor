@@ -22,6 +22,13 @@ utils.time_manager.set_period_restart_ms(
 from onewire import OneWire
 from ds18x20 import DS18X20
 
+beeper_pin = machine.Pin("GPIO16", machine.Pin.OUT, value=0)
+#beeper_pin.value(0)
+beeper_pwm = machine.PWM(beeper_pin)
+beeper_pwm.freq(8)
+beeper_pwm.duty_u16(int(0)) # 0...65535, bei 0: aus
+
+utils.log.avoid_burnIn = True
 
 class DS18b20Tags:
     def __init__(self, id_tags, pin="GPIO1"):
@@ -136,5 +143,17 @@ while True:
         credentials="nano_monitor"
     )  # 'peter_influx_com' ,  'nano_monitor'
 
+    next_pressure_beep_ms = time.ticks_ms()
     while utils.time_manager.need_to_wait(update_period_ms=10 * minute_ms):
+        if time.ticks_diff(next_pressure_beep_ms, time.ticks_ms()) < 0:
+            next_pressure_beep_ms = time.ticks_add(next_pressure_beep_ms, 5000)
+            pressure_Pa = pressure_15_psi_sensor_ali.get_pressure_pa(average_n=1000)
+            if pressure_Pa < 300.0:
+                utils.log.log("%d Pa to low!" % pressure_Pa)
+                utils.log.log("danger: exhaust")
+                utils.log.log("ice building")
+                utils.log.log("change filling!")
+                beeper_pwm.duty_u16(int(65535*0.3))
+            else:
+                beeper_pwm.duty_u16(int(0))
         pass

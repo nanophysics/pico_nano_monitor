@@ -1,4 +1,4 @@
-# 2023 Peter Maerki
+# 2024 Peter Maerki
 # Common functions for RP2 Pico w baords.
 
 import rp2
@@ -93,6 +93,8 @@ class Log:
         self.level_oled = INFO
         self.level_print = TRACE
         self._oled = None
+        self.avoid_burnIn = False
+        self._invert_period_ms = micropython.const(3600000)
 
     def log(self, *string, level=INFO):
         self.log_print(*string, level=level)
@@ -106,6 +108,8 @@ class Log:
         if self._oled:
             if level >= self.level_oled:
                 self._oled.printe("".join(map(str, string)))
+            if self.avoid_burnIn:
+                self._oled._OLED.write_cmd(0xA6+time.ticks_ms()//self._invert_period_ms%2)
 
     def oled_progress_bar(self, progress=0.5):  # progress bar 0.0 ... 1.0
         if self._oled:
@@ -115,7 +119,6 @@ class Log:
         self._oled = oled_1_3.OLED()
         key0.enable()
         key1.enable()
-
 
 class Key:
     def __init__(self, GPx):
