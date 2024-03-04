@@ -24,6 +24,8 @@ utils.time_manager.set_period_restart_ms(
 
 measurement_counter = 0
 
+utils.log.avoid_burnIn = True
+
 from onewire import OneWire
 from ds18x20 import DS18X20
 

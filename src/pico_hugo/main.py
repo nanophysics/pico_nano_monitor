@@ -22,6 +22,8 @@ utils.time_manager.set_period_restart_ms(
     time_restart_ms=24 * hour_ms
 )  # will reset after this time
 
+utils.log.avoid_burnIn = True
+
 S0 = machine.Pin("GPIO2", machine.Pin.OUT)
 S1 = machine.Pin("GPIO3", machine.Pin.OUT)
 S2 = machine.Pin("GPIO4", machine.Pin.OUT)
