@@ -21,6 +21,8 @@ influxFieldKeyDict = {  # Zahlenwerte
     "humidity_pRH": None,
     "flow_ln_per_min": None, # only for He flow sensor
     "total_ln": None, # only for He flow sensor
+    "anforderung": None,  # True False, temporaer, loeschen 2025
+    "zwangsladung": None,  # True False, temporaer, loeschen 2025
 }
 
 influxTagKeyDict = {
