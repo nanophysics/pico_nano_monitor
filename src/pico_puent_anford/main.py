@@ -2,27 +2,25 @@
 for debuging: delete file main.py on RP2. Execute main.py with Thonny from PC
 for final use: put main.py on RP2
 """
-
 import time
 import machine
 import utils
-import random
 import micropython
 
 micropython.alloc_emergency_exception_buf(100)
 
 time.sleep_ms(3000) # allows to interrupt with Thonny
 
-
 utils.wdt.enable()
 utils.log.enable_oled()  # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
 
-minute_ms = 60 * 1000
-hour_ms = 60 * minute_ms
+
+minute_ms = micropython.const(60 * 1000)
+hour_ms = micropython.const(60 * minute_ms)
 utils.time_manager.set_period_restart_ms(
-    time_restart_ms=6 * hour_ms + random.randrange(5 * minute_ms)
+    time_restart_ms=24 * hour_ms
 )  # will reset after this time
 
 anforderung_pin = machine.Pin("GPIO14", machine.Pin.IN)

@@ -190,6 +190,7 @@ class Ota_git:
         return sha
 
     def update_file_if_changed(self, url="", file="", remote_folder=""):
+        gc.collect()
         str_git = self._get_remote_file(url=url, remote_folder=remote_folder, file=file)
         sha_local = self._get_local_sha256(file=file)
         #log.log(f"file: {file}?", level=INFO)
@@ -211,7 +212,6 @@ class Ota_git:
             return 0
 
 ota_git = Ota_git()
-
 
 class FileUpdater:
     def __init__(self):
@@ -259,7 +259,6 @@ def wdt_peter_reset(k):
     print('reset')
     machine.reset()
 
-#WHITE = (255, 255, 255)
 _RED = micropython.const((255, 0, 0))
 _GREEN = micropython.const((0, 255, 0))
 _BLUE = micropython.const((0, 0, 255))
@@ -321,9 +320,7 @@ class Board:
     def main_is_local(self):
         return self._main_is_local
 
-
 board = Board()
-
 
 class Wdt:
     def __init__(self):
@@ -367,9 +364,7 @@ class Wdt:
             log.log(msg, level=INFO)
         return time_since_last_feed
 
-
 wdt = Wdt()
-
 
 class TimeManager:
     def __init__(self):
@@ -457,9 +452,7 @@ class TimeManager:
             string = "%dy" % years + string
         return string
 
-
 time_manager = TimeManager()
-
 
 def url_encode(t):
     result = ""
@@ -484,17 +477,6 @@ class Measurements:
 
     def upload_to_influx(self, credentials="nano_monitor"):
         gc.collect()
-        # upload_to_influx(self.measurements, credentials)
-        # https://www.alibabacloud.com/help/en/lindorm/latest/write-data-by-using-the-influxdb-line-protocol
-        # <table_name>[,<tag_key>=<tag_value>[,<tag_key>=<tag_value>]] <field_key>=<field_value>[,<field_key>=<field_value>] [<timestamp>]
-        # Required: table_name field_set  (timestamp is not required!)
-        # https://docs.influxdata.com/influxdb/v2.6/write-data/developer-tools/api/
-        #     https://docs.influxdata.com/influxdb/v2.6/api/#operation/PostAuthorizations
-
-        # payload = f"airSensor,sensorId=A0100,station=Harbor humidity=35.0658,temperature=37.2"
-        # payload = f"airSensor,sensorId=A0100,station=Baum humidity=35.0658,temperature=37.2\n"
-        #          f"airSensor uptime_s=1234\n"
-
         influxdb_structure.assert_valid(self.measurements)
         payload = ""
         for measurement in self.measurements:
@@ -557,6 +539,5 @@ class Measurements:
                 log.log("Could not upload")
                 reset_after_delay(error=True)
         self.measurements = []
-
 
 mmts = Measurements()
