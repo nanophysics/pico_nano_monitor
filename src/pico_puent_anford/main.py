@@ -8,7 +8,7 @@ import machine
 import utils
 import random
 
-#utils.wdt.enable()
+utils.wdt.enable()
 utils.log.enable_oled()  # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
