@@ -68,7 +68,7 @@ while True:
 
 
 
-    while utils.time_manager.need_to_wait(update_period_ms=1 * minute_ms) and not house_i_change: # if house_i_change, it will upload imediatly
+    while utils.time_manager.need_to_wait(update_period_ms=5 * minute_ms) and not house_i_change: # if house_i_change, it will upload imediatly
         anforderung = anforderung_pin.value()
         if anforderung_last != anforderung:
             anforderung_last = anforderung
