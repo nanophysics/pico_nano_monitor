@@ -16,7 +16,6 @@ utils.log.enable_oled()  # comment out if there is no oled
 utils.wlan.start_wlan()
 utils.file_updater.update_if_local()
 
-
 minute_ms = micropython.const(60 * 1000)
 hour_ms = micropython.const(60 * minute_ms)
 utils.time_manager.set_period_restart_ms(
@@ -25,37 +24,15 @@ utils.time_manager.set_period_restart_ms(
 
 anforderung_pin = machine.Pin("GPIO14", machine.Pin.IN)
 zwangsladung_pin = machine.Pin("GPIO13", machine.Pin.IN)
-
+utils.log.avoid_burnIn = True
 
 board_name = utils.board.get_board_name()
-
-voltage_V = None
-house_i = None
-house_i_last = None
-house_i_change = True
-
-def messen():
-    time.sleep_ms(100)
-    house_i = None
-    if board_name == 'pico_puent':
-        house_i = voltage_i-3
-        if house_i > 15: 
-            house_i = 0
-        if house_i < 1: 
-            house_i = 0
-    if board_name == 'pico_bochs':
-        house_i = voltage_i+12
-        if house_i > 26: 
-            house_i = 0
-        if house_i < 16: 
-            house_i = 0
 
 anforderung_last = None
 zwangsladung_last = None
 
 while True:
     utils.board.set_led(value=1)
-    messen()
     dict_tag = {
         "user": "pmaerki",
         "quality": "testDeleteLater",
