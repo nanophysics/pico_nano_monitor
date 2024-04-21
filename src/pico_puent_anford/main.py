@@ -7,6 +7,12 @@ import time
 import machine
 import utils
 import random
+import micropython
+
+micropython.alloc_emergency_exception_buf(100)
+
+time.sleep_ms(3000) # allows to interrupt with Thonny
+
 
 utils.wdt.enable()
 utils.log.enable_oled()  # comment out if there is no oled
@@ -31,10 +37,7 @@ house_i_last = None
 house_i_change = True
 
 def messen():
-    global voltage_V, house_i, house_i_last, house_i_change
     time.sleep_ms(100)
-    #voltage_V = adc_V.voltage(average_n = 10000)
-    #voltage_i = int(voltage_V+0.5)
     house_i = None
     if board_name == 'pico_puent':
         house_i = voltage_i-3
@@ -48,10 +51,6 @@ def messen():
             house_i = 0
         if house_i < 16: 
             house_i = 0
-    #assert house_i != None
-    #if house_i != house_i_last:
-    #    house_i_change = True
-    #    house_i_last = house_i
 
 anforderung_last = None
 zwangsladung_last = None
@@ -63,15 +62,6 @@ while True:
         "user": "pmaerki",
         "quality": "testDeleteLater",
     }
-    #utils.mmts.append(
-    #    {
-    #        "tags": dict_tag,
-    #        "fields": {
-    #            "voltage_V": "%.3f"
-    #            % voltage_V
-    #        },
-    #    }
-    #)
 
     utils.mmts.append(
         {
