@@ -109,13 +109,13 @@ names_id_dict = {
     b'e6614864d31b8b21': dict(
         name="pico_anna",
         src_folder="src/pico_puent_anford/",
-        src_files=["main.py", "config.py"],
+        src_files=["main.py"],
     ),
 
     b'e6614864d33dab22': dict(
         name="pico_ria",
         src_folder="src/pico_puent_anford/",
-        src_files=["main.py", "config.py"],
+        src_files=["main.py"],
     ),
 
     b'e6613852835f1b25': dict(
