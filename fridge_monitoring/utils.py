@@ -156,11 +156,15 @@ class BlueforsFridge(Fridge):
         return
 
     def log_to_influx(self, path):
-        directory, filename = os.path.split(path)
+        _directory, filename = os.path.split(path)
         print(filename)
         key = self._match_filename(filename)
-        line = self._read_last_line(filepath=path)
-        Date, Time, val = line.split(",", 2)
+        try:
+            line = self._read_last_line(filepath=path)
+        except Exception as e:
+            print(f"Ignore any error while reading the file {path}: {e}")
+            return
+        _date, _time, val = line.split(",", 2)
         self._create_measurements(key, val, filename)
         self.msmnts.upload_to_influx()
 
