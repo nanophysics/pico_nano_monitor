@@ -120,8 +120,8 @@ names_id_dict = {
 
     b'e6613852835f1b25': dict(
         name="pico_lina",
-        src_folder="src/vibration_temperature/",
-        src_files=["main.py", "config.py"],
+        src_folder="src/pico_lina/",
+        src_files=["main.py"],
     ),
 
     b'e6614864d352b321': dict(
