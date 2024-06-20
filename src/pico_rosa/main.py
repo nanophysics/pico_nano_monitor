@@ -149,7 +149,7 @@ def thread_sample():
 minute_ms = micropython.const(60 * 1000)
 hour_ms = micropython.const(60 * minute_ms)
 utils.time_manager.set_period_restart_ms(
-    time_restart_ms=6 * hour_ms + random.randrange(10 * minute_ms)
+    time_restart_ms=24 * hour_ms + random.randrange(10 * minute_ms)
 )  # will reset after this time
 
 
