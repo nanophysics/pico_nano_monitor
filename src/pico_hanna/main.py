@@ -18,7 +18,7 @@ utils.file_updater.update_if_local()
 minute_ms = 60 * 1000
 hour_ms = 60 * minute_ms
 utils.time_manager.set_period_restart_ms(
-    time_restart_ms=6 * hour_ms + random.randrange(10 * minute_ms)
+    time_restart_ms=24 * hour_ms + random.randrange(10 * minute_ms)
 )  # will reset after this time
 
 debug_fix_flow = False
