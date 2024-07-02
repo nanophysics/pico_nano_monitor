@@ -105,7 +105,7 @@ class Pressure_15_psi_sensor_ali:
         u1_V = 0.5
         u2_V = 4.5
         self.overload = voltage_V < u1_V or voltage_V > u2_V
-        pressure_Pa = (p2_pa - p1_pa) / (u2_V - u1_V) * (voltage_V - u1_V)
+        pressure_Pa = (p2_pa - p1_pa) / (u2_V - u1_V) * (voltage_V - u1_V) + p1_pa
         utils.log.log("%.3f V" % voltage_V)
         utils.log.log("%d Pa abs" % pressure_Pa)
         return pressure_Pa
