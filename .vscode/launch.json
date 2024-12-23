@@ -24,6 +24,19 @@
                 "MOCK_INFLUXDB": "1"
             },
             "justMyCode": false
+        },
+        {
+            "name": "observer_files",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "observer_files.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/fridge_monitoring2025",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/fridge_monitoring2025",
+                "BLUEFORS_LOGS_FOLDER": "/home/maerki/work_eth_benedikt/Bluefors_logs/24-12-99",
+            },
+            "justMyCode": false
         }
     ]
 }

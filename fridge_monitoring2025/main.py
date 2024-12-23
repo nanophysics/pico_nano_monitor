@@ -1,47 +1,87 @@
 import logging
+import logging.config
 import os
 import pathlib
 import time
 from bluefors import BlueforsFridge
+from constants import MonitoringError, InfluxDbError, MonitoringWarning
+from file_observer import DirectoryObserver
 
-logging.basicConfig(format="%(asctime)s:%(levelname)s:%(message)s", level=logging.DEBUG)
+DIRECTORY_OF_THIS_FILE = pathlib.Path(__file__).parent
+
+
+def init_logging() -> None:
+    logfilename = DIRECTORY_OF_THIS_FILE / f"monitoring_{os.environ["USERNAME"]}.log"
+
+    dict_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "simple": {"format": "%(levelname)-8s - %(message)s"},
+            "timestamp": {
+                "format": "%(asctime)s - %(levelname)-8s - %(message)s",
+                "datefmt": "%Y-%m-%d %H:%M:%S",
+            },
+        },
+        "handlers": {
+            "logfile": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "level": "DEBUG",
+                "formatter": "timestamp",
+                "filename": logfilename,
+                "maxBytes": 100_000_000,  # 100 MB
+                "backupCount": 3,
+            },
+            "stdout": {
+                "class": "logging.StreamHandler",
+                "level": "INFO",
+                "formatter": "simple",
+                "stream": "ext://sys.stdout",
+            },
+            "stderr": {
+                "class": "logging.StreamHandler",
+                "level": "ERROR",
+                "formatter": "simple",
+                "stream": "ext://sys.stderr",
+            },
+        },
+        "root": {
+            "level": "DEBUG",
+            "handlers": ["stderr", "stdout", "logfile"],
+        },
+    }
+    logging.config.dictConfig(dict_config)
+
 
 logger = logging.getLogger(__file__)
 
 
-def get_fridge() -> BlueforsFridge:
-    username = os.environ["USERNAME"]
-    log_folder = os.environ.get("BLUEFORS_LOGS_FOLDER", None)
-    if log_folder is None:
-        log_folder = rf"C:\Users\{username}\Bluefors logs"
+def main():
+    init_logging()
+    if True:
+        # Run monitoring
+        fridge = BlueforsFridge.factory()
+        observer = DirectoryObserver(fridge=fridge)
+        while True:
+            try:
+                observer.poll()
+            except InfluxDbError as e:
+                logger.exception(e)
+                fridge.reset_influx_db()
+            except MonitoringError as e:
+                logger.error(e)
+            except MonitoringWarning as e:
+                logger.warning(e)
+            except Exception as e:
+                logger.exception(e)
+            time.sleep(10.0)
 
-    fridge_name = {
-        "Sofia_CryoPC": "sofia",
-        "Tabea_CryoPC": "tabea",
-        "maerki": "tabea",
-    }[username]
-
-    return BlueforsFridge(
-        logging_device=f"bluefors_{fridge_name}",
-        setup=fridge_name,
-        room="B17",
-        user="pmaerki",
-        log_folder=pathlib.Path(log_folder),
-        manufacturer="Bluefors",
-    )
+    if False:
+        # Parse all files: Use to test the parser
+        fridge = BlueforsFridge.factory()
+        for f in fridge.log_folder.glob("**/*.log"):
+            fridge.log_influx_file(f)
 
 
 if __name__ == "__main__":
-    fridge = get_fridge()
-    for file in fridge.log_folder.glob("**/*.log"):
-        fridge.log_to_influx(file)
-
-    if False:
-        while True:
-            try:
-                wd = OnMyWatch(fridge)
-                wd.run()
-            except Exception as e:
-                print(e)
-                print("Restarting in 10s")
-                time.sleep(10.0)
+    main()
