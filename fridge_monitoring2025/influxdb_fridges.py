@@ -1,6 +1,10 @@
+import logging
 import os
 import influxdb
 from secrets_file import influx_credentials
+from bluefors import InfluxDbException
+
+logger = logging.getLogger(__file__)
 
 
 class InfluxDB:
@@ -16,27 +20,37 @@ class InfluxDB:
         if os.environ.get("MOCK_INFLUXDB", None):
             print("MOCK_INFLUXDB")
             return
-        
-        self.db_client = influxdb.InfluxDBClient(
-            host=addr,
-            port=port,
-            username=username,
-            password=pw,
-            database=database,
-            ssl=True,
-            verify_ssl=True,
-        )
-        print("Databases present in idb instance: ", self.db_client.get_list_database())
 
-    def push_to_influx(self, dict):
+        try:
+            self.db_client = influxdb.InfluxDBClient(
+                host=addr,
+                port=port,
+                username=username,
+                password=pw,
+                database=database,
+                ssl=True,
+                verify_ssl=True,
+            )
+        except Exception as e:
+            logger.exception(e)
+            raise InfluxDbException(f"Failed to connect to influx: {e!r}") from e
+
+        print(
+            "Databases present in idb instance: ",
+            self.db_client.get_list_database(),
+        )
+
+    def push_to_influx(self, measurements: dict) -> None:
         if os.environ.get("MOCK_INFLUXDB", None):
-            print(f"MOCK_INFLUXDB: {dict}")
+            print(f"MOCK_INFLUXDB: {measurements}")
             return
 
         try:
-            self.db_client.write_points(dict)
-        except:
-            print("!!! It was not possible to write the data point !!!")
+            self.db_client.write_points(measurements)
+        except Exception as e:
+            raise InfluxDbException(
+                f"!!! It was not possible to write the data point !!!: {e!r}"
+            ) from e
 
 
 if __name__ == "__main__":

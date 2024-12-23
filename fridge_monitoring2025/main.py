@@ -1,7 +1,12 @@
+import logging
 import os
 import pathlib
 import time
 from bluefors import BlueforsFridge
+
+logging.basicConfig(format="%(asctime)s:%(levelname)s:%(message)s", level=logging.DEBUG)
+
+logger = logging.getLogger(__file__)
 
 
 def get_fridge() -> BlueforsFridge:

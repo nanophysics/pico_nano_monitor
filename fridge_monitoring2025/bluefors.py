@@ -1,22 +1,34 @@
-from dataclasses import dataclass
-import os
+import itertools
+import logging
 import re
 import pathlib
 import numpy as np
 from influxdb_fridges import InfluxDB
 
+logger = logging.getLogger(__file__)
+
+
+class ParsingException(Exception):
+    pass
+
+
+class InfluxDbException(Exception):
+    pass
+
 
 class BlueforsFridge:
-    def __init__(self,     logging_device: str,
-    setup: str,
-    room: str,
-    user: str,
-    log_folder: pathlib.Path,
-    manufacturer: str,
-)-> None:
+    def __init__(
+        self,
+        logging_device: str,
+        setup: str,
+        room: str,
+        user: str,
+        log_folder: pathlib.Path,
+        manufacturer: str,
+    ) -> None:
         assert isinstance(log_folder, pathlib.Path)
 
-        self.logging_device=logging_device
+        self.logging_device = logging_device
         self.setup = setup
         self.room = room
         self.user = user
@@ -60,7 +72,6 @@ class BlueforsFridge:
         self.influx_handle = InfluxDB()
         self.msmnts = Measurements(self.influx_handle)
 
-
     @classmethod
     def _singleMeasurement(cls) -> set[str]:
         return {"temperature_K", "resistance_Ohm", "flow_mol_per_s"}
@@ -77,36 +88,59 @@ class BlueforsFridge:
     def _package_heaters(
         self, dimension: str, value: str, filename: pathlib.Path
     ) -> None:
-        split = value.split(",")
-        split = np.reshape(split, (2, 2))
-        for i, line in enumerate(split):
+        split1 = value.split(",")
+        for i, v01 in enumerate(itertools.batched(split1, 2)):
+            # print(i, v01[1])
             self._create_single_measurement(
-                dimension, line[1], self._heater_assignement[i]
+                dimension, v01[1], self._heater_assignement[i]
             )
+        # if True:
+        #     print("----------")
+        #     split2 = np.reshape(split1, (2, 2))
+        #     for i, line in enumerate(split2):
+        #         print(i, line[1])
+        #         self._create_single_measurement(
+        #             dimension, line[1], self._heater_assignement[i]
+        #         )
 
     def _package_pressures(
         self, dimension: str, value: str, filename: pathlib.Path
     ) -> None:
-        split = value.split(",")[:-1]
-        split = np.reshape(split, (6, 6))
-        for line in split:
+        value1 = value.split(",")[:-1]
+        for v012345 in itertools.batched(value1, 6):
+            # print(v012345[3], v012345[0])
             self._create_single_measurement(
-                dimension, line[3], self._pressure_assignement[line[0]]
+                dimension, v012345[3], self._pressure_assignement[v012345[0]]
             )
-        return
+        if False:
+            value2 = np.reshape(value1, (6, 6))
+            for line in value2:
+                print(line[3], line[0])
+                # self._create_single_measurement(
+                #     dimension, line[3], self._pressure_assignement[line[0]]
+                # )
 
     def _package_binary(self, dimension: str, value: str) -> None:
-        value = value[2:]
-        value = value.split(",")
-        value = np.reshape(value, (32, 2))
-        for line in value:
-            self._create_single_measurement(dimension, line[1], line[0])
+        value1 = value[2:]
+        value2 = value1.split(",")
+        for v01 in itertools.batched(value2, 2):
+            if len(v01) % 2 != 0:
+                raise ParsingException("Expected even count.")
+            # print(v2, v1)
+            self._create_single_measurement(dimension, v01[1], v01[0])
+
+        # value3 = np.reshape(value2, (32, 2))
+        # for line in value3:
+        #     print(line[1], line[0])
+        #     self._create_single_measurement(dimension, line[1], line[0])
 
     def _package_temperatures_resistances(
         self, dimension: str, value: str, filename: pathlib.Path
     ) -> None:
         # find out witch measurement
         match = re.match(self._regex_dict[dimension], filename.name)
+        if match is None:
+            raise ParsingException()
         position = self._temperature_assignement[match.group(0)[:3]]
 
         self._create_single_measurement(dimension, value, position)
@@ -134,35 +168,31 @@ class BlueforsFridge:
 
         if dimension == "flow_mol_per_s":
             self._package_flow(dimension, value)
+
         if dimension == "binary_state":
             self._package_binary(dimension, value)
-        return
 
     def _create_single_measurement(self, dimension: str, value: str, position):
-        m = dict()
-        tags = dict()
-        fields = dict()
-
-        m["measurement"] = self.logging_device
-
-        tags["room"] = self.room
-        tags["user"] = self.user
-        tags["setup"] = self.setup
-        tags["quality"] = "testDeleteLater"
-        tags["position"] = position
-
         if dimension == "binary_state":
-            fields[dimension] = bool(int(value) * self._SI_unitconverter[dimension])
+            dimension_value = bool(int(value) * self._SI_unitconverter[dimension])
         else:
-            fields[dimension] = float(value) * self._SI_unitconverter[dimension]
+            dimension_value = float(value) * self._SI_unitconverter[dimension]
 
-        m["tags"] = tags
-        m["fields"] = fields
+        m = {
+            "tags": {
+                "room": self.room,
+                "user": self.user,
+                "setup": self.setup,
+                "quality": "testDeleteLater",
+                "position": position,
+            },
+            "measurement": self.logging_device,
+            "fields": {dimension: dimension_value},
+        }
 
         print("Print we are ready to append the following")
         print(m)
         self.msmnts.append(m)
-        return
 
     def log_to_influx(self, filename: pathlib.Path) -> None:
         print(filename)
@@ -178,7 +208,7 @@ class BlueforsFridge:
         self._create_measurements(dimension, val, filename)
         self.msmnts.upload_to_influx()
 
-    def _get_dimension(self, filename: str) -> str|None:
+    def _get_dimension(self, filename: str) -> str | None:
         """
         Returns
          "temperature_K", "resistance_Ohm", "binary_state"...
@@ -232,7 +262,6 @@ class Measurements:
 
         self.influx_handle.push_to_influx(self.measurements)
         self.measurements = []
-        return
 
     def _assert_valid(self, measurement):
         for field_name in measurement["fields"]:
@@ -246,13 +275,3 @@ class Measurements:
             assert (
                 tag_value in valid_values
             ), f"{tag_name}={tag_value} is not in {valid_values}"
-
-
-if __name__ == "__main__":
-    f = BlueforsFridge(
-        logging_device="Zorro",
-        room="heaven",
-        user="benekrat",
-        log_folder="test",
-        manufacturer="dreamfridges",
-    )
