@@ -4,5 +4,12 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"python.autoComplete.extraPaths": [
+			"${workspaceFolder}/fridge_monitoring2025"
+		],
+		"python.analysis.extraPaths": [
+			"${workspaceFolder}/fridge_monitoring2025"
+		]
+	}
 }
