@@ -1,11 +1,7 @@
 fridge_monitoring/secrets_file.py
 fridge_monitoring/Testnotebook.ipynb
-fridge_monitoring/directory_to_watch/22-06-29/CH1 R 22-06-29.log
-fridge_monitoring/directory_to_watch/22-06-29/CH1 T 22-06-29.log
-fridge_monitoring/directory_to_watch/22-06-29/Channels 22-06-29.log
-fridge_monitoring/directory_to_watch/22-06-29/Flowmeter 22-06-29.log
-fridge_monitoring/directory_to_watch/22-06-29/Heaters 23-01-24.log
-fridge_monitoring/directory_to_watch/22-06-29/maxigauge 22-06-29.log
+fridge_monitoring/directory_to_watch/*
+fridge_monitoring2025/monitoring_*.log*
 src/vibration_temperature/secrets_peter_schaer/secrets.py
 src/vibration_temperature/secrets_andi/secrets.py
 various/beschriftung/
