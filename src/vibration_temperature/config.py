@@ -88,9 +88,9 @@ pico_tags ={
     'pico_leo': {
     'general': {'user': 'pmaerki','quality': 'testDeleteLater'},
     'DS18B20_id_tags': {
-    '2840D3660E000016': {'position': 'zelg_42_speicher_oben'}, 
-    '28B829660E0000DE': {'position': 'zelg_42_speicher_mitte'}, 
-    '28F0C8660E00001D': {'position': 'zelg_42_speicher_unten'}},
+    '2840D3660E000016': {'position': 'speicherraum_frostwaechter_C'}, 
+    '28B829660E0000DE': {'position': 'speicherraum_boden1_C'}, 
+    '28F0C8660E00001D': {'position': 'speicherraum_boden2_C'}},
     'vibration': False, 'credentials': 'peter_maerki_com'},
 
     'pico_lia': {

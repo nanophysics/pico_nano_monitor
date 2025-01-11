@@ -64,11 +64,7 @@ while True:
         credentials='peter_maerki_com'
     )  # 'peter_influx_com' ,  'nano_monitor'
 
-    house_i_change = False
-
-
-
-    while utils.time_manager.need_to_wait(update_period_ms=5 * minute_ms) and not house_i_change: # if house_i_change, it will upload imediatly
+    while utils.time_manager.need_to_wait(update_period_ms=5 * minute_ms): 
         anforderung = anforderung_pin.value()
         if anforderung_last != anforderung:
             anforderung_last = anforderung
