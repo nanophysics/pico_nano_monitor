@@ -2,6 +2,7 @@ from __future__ import annotations
 import datetime
 import itertools
 import logging
+import time
 import os
 import re
 import pathlib
@@ -261,16 +262,19 @@ class BlueforsFridge:
             if dimension is None:
                 return 0
 
+            # Line: 09-12-24,00:00:10,9.459000e+00
             v012 = line.split(",", 2)
             if len(v012) != 3:
                 raise MonitoringWarning("Expected 3 elements")
 
             _date, _time, val = v012
-            meas_time_str = f"20{_date}_{_time}"
-            meas_time = datetime.datetime.strptime(
-                meas_time_str, "%Y-%m-%d_%H:%M:%S"
-            ).timestamp()
-            self._create_measurements(meas_time, dimension, val, filename)
+            meas_time_str = f"{_date}_{_time}"
+            # meas_time_str: 09-12-24_00:00:10
+            meas_time = datetime.datetime.strptime(meas_time_str, "%d-%m-%y_%H:%M:%S")
+            meas_time_stamp = meas_time.timestamp()
+            diff_s = meas_time_stamp - time.time()
+            assert abs(diff_s) < 48 * 3600
+            self._create_measurements(meas_time_stamp, dimension, val, filename)
             return self.msmnts.upload_to_influx()
 
         except Exception as e:
