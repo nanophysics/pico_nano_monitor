@@ -1,5 +1,6 @@
 import logging
 import pathlib
+import typing
 from bluefors import BlueforsFridge
 from constants import MonitoringError
 
@@ -13,7 +14,7 @@ class FileObserver:
         self.f = self.filename.open("r", encoding=None)
         # self.f.seek(0, os.SEEK_END)
 
-    def follow_obsolete(self) -> str | None:
+    def follow_obsolete(self) -> typing.Optional[str]:
         # curr_position = self.f.tell()
         line = self.f.readline()
         assert isinstance(line, str)

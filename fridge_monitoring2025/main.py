@@ -11,7 +11,7 @@ DIRECTORY_OF_THIS_FILE = pathlib.Path(__file__).parent
 
 
 def init_logging() -> None:
-    logfilename = DIRECTORY_OF_THIS_FILE / f"monitoring_{os.environ["USERNAME"]}.log"
+    logfilename = DIRECTORY_OF_THIS_FILE / f"monitoring_{os.environ['USERNAME']}.log"
 
     dict_config = {
         "version": 1,
