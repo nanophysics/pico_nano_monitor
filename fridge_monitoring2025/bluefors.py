@@ -1,16 +1,30 @@
 from __future__ import annotations
 import datetime
-import itertools
 import logging
 import time
 import os
 import re
 import pathlib
+import typing
 from influxdb_fridges import InfluxDB
 from constants import MonitoringWarning
 
 logger = logging.getLogger(__file__)
 
+def batched(l: list[str], step: int) -> typing.Iterator[list[str]]:
+    """
+    Backport for 'itertools.batched()' 
+    """
+    if len(l) % step != 0:
+        logger.warning(f"Does not match: {len(l)=} {step=}: {l}")
+    for i in range(0, len(l), step):
+        yield l[i:i+step]
+
+# Test batched
+result = list(batched(l=[1, 2, 3, 4, 5], step=2))
+assert result==[[1,2],[3,4],[5]]
+result = list(batched(l=[1, 2, 3, 4, 5], step=3))
+assert result==[[1,2,3],[4,5]]
 
 class BlueforsFridge:
     _singleMeasurement = {
@@ -116,7 +130,7 @@ class BlueforsFridge:
         assert isinstance(meas_time, float)
 
         split1 = value.split(",")
-        for i, v01 in enumerate(itertools.batched(split1, 2)):
+        for i, v01 in enumerate(batched(split1, 2)):
             # print(i, v01[1])
             self._create_single_measurement(
                 meas_time,
@@ -139,7 +153,7 @@ class BlueforsFridge:
         assert isinstance(meas_time, float)
 
         value1 = value.split(",")[:-1]
-        for v012345 in itertools.batched(value1, 6):
+        for v012345 in batched(value1, 6):
             # print(v012345[3], v012345[0])
             self._create_single_measurement(
                 meas_time,
@@ -159,7 +173,7 @@ class BlueforsFridge:
         assert isinstance(meas_time, float)
         value1 = value[2:]
         value2 = value1.split(",")
-        for v01 in itertools.batched(value2, 2):
+        for v01 in batched(value2, 2):
             if len(v01) % 2 != 0:
                 raise MonitoringWarning("Expected even count.")
             # print(v2, v1)
